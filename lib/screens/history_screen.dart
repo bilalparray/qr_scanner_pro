@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_scanner/widgets/code_bottom_sheet.dart';
 import '../providers/code_provider.dart';
 
 class HistoryScreen extends StatelessWidget {
@@ -86,34 +87,21 @@ class HistoryScreen extends StatelessWidget {
                       entry.isFavorite ? Icons.favorite : Icons.favorite_border,
                       color: entry.isFavorite ? Colors.red : null,
                     ),
-                    onPressed: () {
-                      provider.toggleFavorite(entry);
-                    },
+                    onPressed: () => provider.toggleFavorite(entry),
                   ),
                   onTap: () {
-                    showDialog(
+                    showModalBottomSheet(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(entry.type.toUpperCase()),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Content: ${entry.content}'),
-                            const SizedBox(height: 8),
-                            Text('Date: ${entry.formattedDate}'),
-                            if (entry.format != null) ...[
-                              const SizedBox(height: 8),
-                              Text('Format: ${entry.format}'),
-                            ],
-                          ],
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Close'),
-                          ),
-                        ],
+                      ),
+                      isScrollControlled: true,
+                      builder: (context) => ResultSheet(
+                        result: entry.content,
+                        type: entry.type,
+                        format: entry.format ?? 'Code128',
                       ),
                     );
                   },

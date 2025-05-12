@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qr_scanner/widgets/code_bottom_sheet.dart';
 import 'dart:io';
 
 import '../providers/code_provider.dart';
@@ -133,6 +134,20 @@ END:VEVENT
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Saved successfully!')),
+      );
+      // ✅ Show bottom sheet after generation
+      showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        isScrollControlled: true,
+        builder: (context) => ResultSheet(
+          result: data,
+          type: _selectedType,
+          format:
+              _selectedType == 'barcode' ? _selectedFormat : _selectedQrType,
+        ),
       );
       setState(() {
         _generatedData = data;
