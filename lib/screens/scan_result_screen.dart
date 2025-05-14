@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_contacts/flutter_contacts.dart' as contacts;
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wifi_iot/wifi_iot.dart';
+import 'package:intl/intl.dart';
 
 class ScanResultScreen extends StatelessWidget {
   final String content;
@@ -17,10 +19,11 @@ class ScanResultScreen extends StatelessWidget {
     required this.timestamp,
   });
 
+  // region [Handlers]
   void _handleContact(BuildContext context) async {
     try {
-      final contact = Contact.fromVCard(content);
-      if (!await FlutterContacts.requestPermission()) {
+      final contact = contacts.Contact.fromVCard(content);
+      if (!await contacts.FlutterContacts.requestPermission()) {
         _showSnackBar(context, 'Contact permission denied');
         return;
       }
@@ -31,39 +34,150 @@ class ScanResultScreen extends StatelessWidget {
     }
   }
 
-  void _handleWifi(BuildContext context) {
-    final wifiPattern = RegExp(r'WIFI:S:(.+?);T:(.+?);P:(.+?);;');
+  void _handleSms(BuildContext context) {
+    final smsPattern = RegExp(r'^smsto:(\+?[\d-]+):?(.*)\$');
+    final match = smsPattern.firstMatch(content);
+    if (match != null) {
+      final number = match.group(1);
+      final message = match.group(2) ?? '';
+      launchUrl(Uri.parse('sms:$number?body=$message'));
+    }
+  }
+
+  void _handleWifi(BuildContext context) async {
+    final wifiPattern = RegExp(r'^WIFI:T:(WPA|WEP|nopass)?;S:(.*?);P:(.*?);;');
     final match = wifiPattern.firstMatch(content);
     if (match != null) {
-      final ssid = match.group(1);
-      final security = match.group(2);
-      final password = match.group(3);
+      final security = match.group(1) ?? 'nopass';
+      final ssid = match.group(2)!;
+      final password = match.group(3)!;
+      try {
+        bool connected = await WiFiForIoTPlugin.connect(
+          ssid,
+          password: password,
+          security: security.toLowerCase() == 'wep'
+              ? NetworkSecurity.WEP
+              : security.toLowerCase() == 'wpa'
+                  ? NetworkSecurity.WPA
+                  : NetworkSecurity.NONE,
+          joinOnce: true,
+        );
+        _showSnackBar(context,
+            connected ? 'Connected to $ssid' : 'Failed to connect to $ssid');
+      } catch (e) {
+        _showSnackBar(context, 'Error connecting to WiFi: $e');
+      }
+    }
+  }
 
-      WiFiForIoTPlugin.connect(
-        ssid!,
-        password: password,
-        security: _parseSecurity(security!),
-      ).then((success) {
-        _showSnackBar(
-            context, success ? 'Connected to $ssid' : 'Connection failed');
+  void _handlePhone(BuildContext context) {
+    final phonePattern = RegExp(r'^tel:(\+?[\d-]+)\$');
+    final match = phonePattern.firstMatch(content);
+    if (match != null) {
+      launchUrl(Uri.parse(content));
+    }
+  }
+
+  void _handleEmail(BuildContext context) {
+    final emailPattern = RegExp(r'^mailto:([^?]+)(\?[^?]+)?\$');
+    final match = emailPattern.firstMatch(content);
+    if (match != null) {
+      launchUrl(Uri.parse(content));
+    }
+  }
+
+  void _handleCalendar(BuildContext context) async {
+    try {
+      final eventPattern = RegExp(
+        r'BEGIN:VEVENT'
+        r'(.*?)'
+        r'END:VEVENT',
+        caseSensitive: false,
+        dotAll: true,
+      );
+
+      final match = eventPattern.firstMatch(content);
+      if (match != null) {
+        final eventContent = match.group(1)!;
+
+        final Map<String, String> eventData = {
+          for (final line in eventContent.split('\n'))
+            if (line.contains(':'))
+              line.split(':')[0].trim().toUpperCase(): line.split(':')[1].trim()
+        };
+
+        final start =
+            DateFormat("yyyyMMdd'T'HHmmss").parse(eventData['DTSTART']!);
+        final end = DateFormat("yyyyMMdd'T'HHmmss").parse(eventData['DTEND']!);
+
+        launchUrl(Uri.parse('https://www.google.com/calendar/render?'
+            'action=TEMPLATE'
+            '&text=${Uri.encodeComponent(eventData['SUMMARY']!)}'
+            '&dates=${DateFormat('yyyyMMdd').format(start)}/'
+            '${DateFormat('yyyyMMdd').format(end)}'
+            '&details=${Uri.encodeComponent(eventData['DESCRIPTION']!)}'
+            '&location=${Uri.encodeComponent(eventData['LOCATION']!)}'));
+      }
+    } catch (e) {
+      _showSnackBar(context, 'Error parsing calendar event: $e');
+    }
+  }
+
+  void _handleLocation(BuildContext context) {
+    final geoPattern = RegExp(r'^geo:(-?\d+\.\d+),(-?\d+\.\d+)');
+    final match = geoPattern.firstMatch(content);
+    if (match != null) {
+      final lat = match.group(1);
+      final lng = match.group(2);
+      launchUrl(Uri.parse(
+          'https://www.google.com/maps/search/?api=1&query=$lat,$lng'));
+    }
+  }
+
+  void _handleMeCard(BuildContext context) async {
+    try {
+      final meCardPattern = RegExp(r'MECARD:(.*?);');
+      final data = meCardPattern.allMatches(content).fold(<String, String>{},
+          (map, match) {
+        final parts = match.group(1)!.split(':');
+        if (parts.length == 2) {
+          map[parts[0]] = parts[1];
+        }
+        return map;
       });
+
+      final contact = contacts.Contact()
+        ..name.first = data['N'] ?? ''
+        ..phones = [contacts.Phone(data['TEL'] ?? '')]
+        ..emails = [contacts.Email(data['EMAIL'] ?? '')]
+        ..notes = [contacts.Note(data['NOTE'] ?? '')];
+
+      if (!await contacts.FlutterContacts.requestPermission()) {
+        _showSnackBar(context, 'Contact permission denied');
+        return;
+      }
+      await contact.insert();
+      _showSnackBar(context, 'MeCard contact saved');
+    } catch (e) {
+      _showSnackBar(context, 'Error saving MeCard: $e');
     }
   }
 
-  NetworkSecurity _parseSecurity(String security) {
-    switch (security) {
-      case 'WPA':
-        return NetworkSecurity.WPA;
-      case 'WEP':
-        return NetworkSecurity.WEP;
-      default:
-        return NetworkSecurity.WPA;
+  void _handleCrypto(BuildContext context) {
+    final cryptoPattern = RegExp(r'^(bitcoin|ethereum):.+');
+    if (cryptoPattern.hasMatch(content)) {
+      Clipboard.setData(ClipboardData(text: content));
+      _showSnackBar(context, 'Crypto address copied');
     }
   }
+  // endregion
 
   void _showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
@@ -72,6 +186,13 @@ class ScanResultScreen extends StatelessWidget {
     final isUrl = Uri.tryParse(content)?.hasAbsolutePath ?? false;
     final isContact = content.startsWith('BEGIN:VCARD');
     final isWifi = content.startsWith('WIFI:');
+    final isSms = content.startsWith('smsto:');
+    final isPhone = content.startsWith('tel:');
+    final isEmail = content.startsWith('mailto:');
+    final isCalendar = content.contains('BEGIN:VEVENT');
+    final isLocation = content.startsWith('geo:');
+    final isMeCard = content.startsWith('MECARD:');
+    final isCrypto = RegExp(r'^(bitcoin|ethereum):').hasMatch(content);
 
     return Scaffold(
       appBar: AppBar(
@@ -89,7 +210,8 @@ class ScanResultScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildInfoRow('Scan Type', format),
-            _buildInfoRow('Timestamp', timestamp.toString()),
+            _buildInfoRow('Timestamp',
+                DateFormat('yyyy-MM-dd HH:mm:ss').format(timestamp)),
             const SizedBox(height: 20),
             const Text(
               'Content:',
@@ -101,7 +223,19 @@ class ScanResultScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 30),
-            _buildActionButtons(isUrl, isContact, isWifi),
+            _buildActionButtons(
+              context,
+              isUrl,
+              isContact,
+              isWifi,
+              isSms,
+              isPhone,
+              isEmail,
+              isCalendar,
+              isLocation,
+              isMeCard,
+              isCrypto,
+            ),
           ],
         ),
       ),
@@ -127,43 +261,94 @@ class ScanResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(bool isUrl, bool isContact, bool isWifi) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    bool isUrl,
+    bool isContact,
+    bool isWifi,
+    bool isSms,
+    bool isPhone,
+    bool isEmail,
+    bool isCalendar,
+    bool isLocation,
+    bool isMeCard,
+    bool isCrypto,
+  ) {
     return Wrap(
       spacing: 12,
       runSpacing: 12,
       children: [
         if (isUrl)
-          ElevatedButton.icon(
-            icon: const Icon(Icons.open_in_browser),
-            label: const Text('Open URL'),
-            onPressed: () => launchUrl(Uri.parse(content)),
-          ),
+          _buildActionButton(
+              icon: Icons.open_in_browser,
+              label: 'Open URL',
+              onPressed: () => launchUrl(Uri.parse(content))),
         if (isContact)
-          ElevatedButton(
-            onPressed: () => _handleContact,
-            child: const Text('Save Contact'),
-          ),
+          _buildActionButton(
+              icon: Icons.contact_page,
+              label: 'Save Contact',
+              onPressed: () => _handleContact(context)),
         if (isWifi)
-          ElevatedButton(
-            onPressed: () => _handleWifi,
-            child: const Text('Connect to WiFi'),
-          ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.copy),
-          label: const Text('Copy'),
+          _buildActionButton(
+              icon: Icons.wifi,
+              label: 'Connect WiFi',
+              onPressed: () => _handleWifi(context)),
+        if (isSms)
+          _buildActionButton(
+              icon: Icons.message,
+              label: 'Send SMS',
+              onPressed: () => _handleSms(context)),
+        if (isPhone)
+          _buildActionButton(
+              icon: Icons.phone,
+              label: 'Call',
+              onPressed: () => _handlePhone(context)),
+        if (isEmail)
+          _buildActionButton(
+              icon: Icons.email,
+              label: 'Send Email',
+              onPressed: () => _handleEmail(context)),
+        if (isCalendar)
+          _buildActionButton(
+              icon: Icons.calendar_today,
+              label: 'Add to Calendar',
+              onPressed: () => _handleCalendar(context)),
+        if (isLocation)
+          _buildActionButton(
+              icon: Icons.map,
+              label: 'Open Map',
+              onPressed: () => _handleLocation(context)),
+        if (isMeCard)
+          _buildActionButton(
+              icon: Icons.contact_phone,
+              label: 'Save MeCard',
+              onPressed: () => _handleMeCard(context)),
+        if (isCrypto)
+          _buildActionButton(
+              icon: Icons.currency_bitcoin,
+              label: 'Copy Address',
+              onPressed: () => _handleCrypto(context)),
+        _buildActionButton(
+          icon: Icons.copy,
+          label: 'Copy',
           onPressed: () async {
             await Clipboard.setData(ClipboardData(text: content));
-            // _showSnackBar(context, 'Copied to clipboard'); // Added context
-          },
-        ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.history),
-          label: const Text('Add to History'),
-          onPressed: () {
-            // _showSnackBar(context, 'Added to history'); // Added context
+            _showSnackBar(context, 'Copied to clipboard');
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      icon: Icon(icon),
+      label: Text(label),
+      onPressed: onPressed,
     );
   }
 }

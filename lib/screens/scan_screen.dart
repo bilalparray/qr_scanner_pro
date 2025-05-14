@@ -41,7 +41,7 @@ class _ScanScreenState extends State<ScanScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null) return;
 
-    setState(() => _isScanning = false);
+    setState(() => _isScanning = true);
 
     try {
       final inputImage = mlkit.InputImage.fromFilePath(pickedFile.path);
@@ -102,7 +102,7 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _handleScannedCode(String code, BarcodeFormat format) async {
-    if (_isScanning) return;
+    if (!_isScanning) return;
     setState(() => _isScanning = false);
 
     final entry = CodeEntry(
