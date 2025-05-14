@@ -35,12 +35,24 @@ class ScanResultScreen extends StatelessWidget {
   }
 
   void _handleSms(BuildContext context) {
-    final smsPattern = RegExp(r'^smsto:(\+?[\d-]+):?(.*)\$');
+    final smsPattern = RegExp(r'^SMSTO:(\+?[\d-]+):?(.*)$');
     final match = smsPattern.firstMatch(content);
+
     if (match != null) {
       final number = match.group(1);
-      final message = match.group(2) ?? '';
-      launchUrl(Uri.parse('sms:$number?body=$message'));
+      final message = Uri.encodeComponent(match.group(2) ?? '');
+
+      final uri = Uri.parse('sms:$number?body=$message');
+
+      launchUrl(uri, mode: LaunchMode.externalApplication).catchError((e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open SMS app: $e')),
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid SMS format')),
+      );
     }
   }
 
@@ -79,10 +91,41 @@ class ScanResultScreen extends StatelessWidget {
   }
 
   void _handleEmail(BuildContext context) {
-    final emailPattern = RegExp(r'^mailto:([^?]+)(\?[^?]+)?\$');
-    final match = emailPattern.firstMatch(content);
-    if (match != null) {
-      launchUrl(Uri.parse(content));
+    try {
+      Uri? uri;
+
+      if (content.startsWith('mailto:')) {
+        // Standard mailto: link
+        uri = Uri.parse(content);
+      } else if (content.startsWith('MATMSG:')) {
+        // Parse MATMSG format
+        final toMatch = RegExp(r'TO:([^;]+);').firstMatch(content);
+        final subMatch = RegExp(r'SUB:([^;]*);').firstMatch(content);
+        final bodyMatch = RegExp(r'BODY:([^;]*);').firstMatch(content);
+
+        final to = toMatch?.group(1)?.trim() ?? '';
+        final subject = Uri.encodeComponent(subMatch?.group(1)?.trim() ?? '');
+        final body = Uri.encodeComponent(bodyMatch?.group(1)?.trim() ?? '');
+
+        uri = Uri.parse('mailto:$to?subject=$subject&body=$body');
+      } else if (content.startsWith('SMTP:')) {
+        // Optional: SMTP:user@example.com:Subject:Body
+        final parts = content.split(':');
+        if (parts.length >= 4) {
+          final to = parts[1];
+          final subject = Uri.encodeComponent(parts[2]);
+          final body = Uri.encodeComponent(parts[3]);
+          uri = Uri.parse('mailto:$to?subject=$subject&body=$body');
+        }
+      }
+
+      if (uri != null) {
+        launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        _showSnackBar(context, 'Unsupported email format');
+      }
+    } catch (e) {
+      _showSnackBar(context, 'Failed to open email app: $e');
     }
   }
 
@@ -186,9 +229,12 @@ class ScanResultScreen extends StatelessWidget {
     final isUrl = Uri.tryParse(content)?.hasAbsolutePath ?? false;
     final isContact = content.startsWith('BEGIN:VCARD');
     final isWifi = content.startsWith('WIFI:');
-    final isSms = content.startsWith('smsto:');
+    final isSms = content.startsWith('SMSTO:');
     final isPhone = content.startsWith('tel:');
-    final isEmail = content.startsWith('mailto:');
+    final isEmail = content.startsWith('mailto:') ||
+        content.startsWith('MATMSG:') ||
+        content.startsWith('SMTP:');
+
     final isCalendar = content.contains('BEGIN:VEVENT');
     final isLocation = content.startsWith('geo:');
     final isMeCard = content.startsWith('MECARD:');

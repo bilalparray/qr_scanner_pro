@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart'
     as mlkit;
-import 'package:clipboard/clipboard.dart';
-
 import '../providers/code_provider.dart';
 import '../models/code_entry.dart';
 import 'scan_result_screen.dart';
@@ -37,11 +35,14 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _scanFromGallery() async {
+    setState(() {
+      _isScanning = true;
+      _isFlashOn = false;
+      _controller.toggleTorch();
+    });
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null) return;
-
-    setState(() => _isScanning = true);
 
     try {
       final inputImage = mlkit.InputImage.fromFilePath(pickedFile.path);
@@ -94,8 +95,10 @@ class _ScanScreenState extends State<ScanScreen> {
         return BarcodeFormat.itf;
       case mlkit.BarcodeFormat.pdf417:
         return BarcodeFormat.pdf417;
-      // case mlkit.BarcodeFormat.upcA: return BarcodeFormat.upcA;
-      // case mlkit.BarcodeFormat.upcE: return BarcodeFormat.upcE;
+      case mlkit.BarcodeFormat.upca:
+        return BarcodeFormat.upcA;
+      case mlkit.BarcodeFormat.upce:
+        return BarcodeFormat.upcE;
       default:
         return BarcodeFormat.unknown;
     }
@@ -103,7 +106,13 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Future<void> _handleScannedCode(String code, BarcodeFormat format) async {
     if (!_isScanning) return;
-    setState(() => _isScanning = false);
+    setState(() {
+      _isScanning = false;
+      if (_isFlashOn) {
+        _isFlashOn = false;
+        _controller.toggleTorch();
+      }
+    });
 
     final entry = CodeEntry(
       content: code,
@@ -182,8 +191,9 @@ class _ScanScreenState extends State<ScanScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              color: Colors.black54,
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              width: 250,
+              color: const Color.fromARGB(137, 120, 119, 119),
+              padding: const EdgeInsets.all(8),
               child: const Text(
                 'Align code within frame to scan',
                 textAlign: TextAlign.center,
