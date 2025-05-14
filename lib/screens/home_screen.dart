@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/ad_provider.dart';
+import 'package:qr_scanner/screens/settings_screen.dart';
 import 'generate_screen.dart';
 import 'scan_screen.dart';
 import 'history_screen.dart';
 import 'favorites_screen.dart';
-import 'premium_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,16 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
     const ScanScreen(),
     const HistoryScreen(),
     const FavoritesScreen(),
-    const PremiumScreen(),
+    const SettingsScreen(),
   ];
 
   @override
   void initState() {
     super.initState();
-    // Initialize ads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdProvider>().initialize();
-    });
   }
 
   @override
@@ -62,8 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Favorites',
           ),
           NavigationDestination(
-            icon: Icon(Icons.star),
-            label: 'Premium',
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),

@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'providers/code_provider.dart';
-import 'providers/ad_provider.dart';
 import 'models/code_entry.dart';
 import 'screens/home_screen.dart';
 
@@ -48,7 +47,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CodeProvider()),
-        ChangeNotifierProvider(create: (_) => AdProvider()),
       ],
       child: MaterialApp(
         title: 'QR Scanner & Generator',
