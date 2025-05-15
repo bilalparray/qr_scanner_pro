@@ -56,29 +56,47 @@ class ScanResultScreen extends StatelessWidget {
     }
   }
 
-  void _handleWifi(BuildContext context) async {
-    final wifiPattern = RegExp(r'^WIFI:T:(WPA|WEP|nopass)?;S:(.*?);P:(.*?);;');
+  void _handleWifi(BuildContext context, String content) async {
+    final wifiPattern = RegExp(
+      r'^WIFI:(?:S:(.*?);)?(?:T:(.*?);)?(?:P:(.*?);)?(?:H:(true|false);)?;?$',
+    );
+
     final match = wifiPattern.firstMatch(content);
+
     if (match != null) {
-      final security = match.group(1) ?? 'nopass';
-      final ssid = match.group(2)!;
-      final password = match.group(3)!;
+      final ssid = match.group(1);
+      final type = match.group(2)?.toLowerCase() ?? 'nopass';
+      final password = match.group(3);
+      final hidden = match.group(4) == 'true';
+
+      if (ssid == null || ssid.isEmpty) {
+        _showSnackBar(context, 'SSID is missing in the WiFi QR code');
+        return;
+      }
+
+      final security = switch (type) {
+        'wep' => NetworkSecurity.WEP,
+        'wpa' => NetworkSecurity.WPA,
+        _ => NetworkSecurity.NONE,
+      };
+
       try {
-        bool connected = await WiFiForIoTPlugin.connect(
+        final connected = await WiFiForIoTPlugin.connect(
           ssid,
-          password: password,
-          security: security.toLowerCase() == 'wep'
-              ? NetworkSecurity.WEP
-              : security.toLowerCase() == 'wpa'
-                  ? NetworkSecurity.WPA
-                  : NetworkSecurity.NONE,
+          password: security == NetworkSecurity.NONE ? null : password,
+          security: security,
           joinOnce: true,
+          withInternet: true,
+          isHidden: hidden,
         );
+
         _showSnackBar(context,
             connected ? 'Connected to $ssid' : 'Failed to connect to $ssid');
       } catch (e) {
         _showSnackBar(context, 'Error connecting to WiFi: $e');
       }
+    } else {
+      _showSnackBar(context, 'Invalid WiFi QR code format');
     }
   }
 
@@ -338,7 +356,7 @@ class ScanResultScreen extends StatelessWidget {
           _buildActionButton(
               icon: Icons.wifi,
               label: 'Connect WiFi',
-              onPressed: () => _handleWifi(context)),
+              onPressed: () => _handleWifi(context, content)),
         if (isSms)
           _buildActionButton(
               icon: Icons.message,
