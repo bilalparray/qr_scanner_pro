@@ -35,10 +35,14 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _scanFromGallery() async {
+    if (_isFlashOn) {
+      setState(() {
+        _isFlashOn = false;
+      });
+      _controller.toggleTorch();
+    }
     setState(() {
       _isScanning = true;
-      _isFlashOn = false;
-      _controller.toggleTorch();
     });
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
