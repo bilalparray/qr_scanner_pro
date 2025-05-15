@@ -101,10 +101,14 @@ class ScanResultScreen extends StatelessWidget {
   }
 
   void _handlePhone(BuildContext context) {
-    final phonePattern = RegExp(r'^tel:(\+?[\d-]+)\$');
-    final match = phonePattern.firstMatch(content);
+    final phonePattern = RegExp(r'^tel:(\+?[0-9]+)$');
+    final match = phonePattern.firstMatch(content.trim());
     if (match != null) {
       launchUrl(Uri.parse(content));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid phone number format')),
+      );
     }
   }
 
