@@ -154,9 +154,7 @@ class ScanResultScreen extends StatelessWidget {
   void _handleCalendar(BuildContext context) async {
     try {
       final eventPattern = RegExp(
-        r'BEGIN:VEVENT'
-        r'(.*?)'
-        r'END:VEVENT',
+        r'BEGIN:VEVENT(.*?)END:VEVENT',
         caseSensitive: false,
         dotAll: true,
       );
@@ -165,26 +163,101 @@ class ScanResultScreen extends StatelessWidget {
       if (match != null) {
         final eventContent = match.group(1)!;
 
-        final Map<String, String> eventData = {
-          for (final line in eventContent.split('\n'))
-            if (line.contains(':'))
-              line.split(':')[0].trim().toUpperCase(): line.split(':')[1].trim()
+        // 1. Unfold lines and split
+        final unfolded = eventContent.replaceAll(RegExp(r'(\r\n|\n)[ \t]'), '');
+        final lines = unfolded.split(RegExp(r'\r?\n'));
+
+        // 2. Parse event properties
+        final Map<String, String> eventData = {};
+        for (final line in lines) {
+          final colonIndex = line.indexOf(':');
+          if (colonIndex == -1) continue;
+          final key =
+              line.substring(0, colonIndex).split(';')[0].trim().toUpperCase();
+          final value = line.substring(colonIndex + 1).trim();
+          eventData[key] = value;
+        }
+
+        // 3. Manual date parser
+        DateTime? parseDate(String? dateStr) {
+          if (dateStr == null) return null;
+          try {
+            bool isUtc = dateStr.endsWith('Z');
+            if (isUtc) dateStr = dateStr.substring(0, dateStr.length - 1);
+
+            if (dateStr.contains('T')) {
+              final parts = dateStr.split('T');
+              if (parts.length != 2) return null;
+
+              // Date part (YYYYMMDD)
+              if (parts[0].length != 8) return null;
+              final year = int.parse(parts[0].substring(0, 4));
+              final month = int.parse(parts[0].substring(4, 6));
+              final day = int.parse(parts[0].substring(6, 8));
+
+              // Time part (HHMMSS)
+              if (parts[1].length != 6) return null;
+              final hour = int.parse(parts[1].substring(0, 2));
+              final minute = int.parse(parts[1].substring(2, 4));
+              final second = int.parse(parts[1].substring(4, 6));
+
+              return isUtc
+                  ? DateTime.utc(year, month, day, hour, minute, second)
+                  : DateTime(year, month, day, hour, minute, second);
+            } else {
+              // All-day event (YYYYMMDD)
+              if (dateStr.length != 8) return null;
+              final year = int.parse(dateStr.substring(0, 4));
+              final month = int.parse(dateStr.substring(4, 6));
+              final day = int.parse(dateStr.substring(6, 8));
+              return DateTime(year, month, day);
+            }
+          } catch (e) {
+            print('Date parsing failed: $dateStr');
+            return null;
+          }
+        }
+
+        // 4. Get dates
+        final start = parseDate(eventData['DTSTART']);
+        final end = parseDate(eventData['DTEND']);
+
+        if (start == null || end == null) {
+          _showSnackBar(context, 'Invalid start/end dates');
+          return;
+        }
+
+        // 5. Format for Google Calendar
+        String formatGoogleDate(DateTime dt) {
+          final date = DateFormat('yyyyMMdd').format(dt);
+          final time = DateFormat('HHmmss').format(dt);
+          return '${date}T${time}';
+        }
+
+        final isAllDay = eventData['DTSTART']?.contains('T') != true;
+        final datesParam = isAllDay
+            ? '${DateFormat('yyyyMMdd').format(start)}/${DateFormat('yyyyMMdd').format(end)}'
+            : '${formatGoogleDate(start)}/${formatGoogleDate(end)}';
+
+        // 6. Build URL
+        final params = {
+          'action': 'TEMPLATE',
+          'text': Uri.encodeComponent(eventData['SUMMARY'] ?? 'Event'),
+          'dates': datesParam,
+          'details': Uri.encodeComponent(eventData['DESCRIPTION'] ?? ''),
+          'location': Uri.encodeComponent(eventData['LOCATION'] ?? ''),
         };
 
-        final start =
-            DateFormat("yyyyMMdd'T'HHmmss").parse(eventData['DTSTART']!);
-        final end = DateFormat("yyyyMMdd'T'HHmmss").parse(eventData['DTEND']!);
+        final url = Uri.https('www.google.com', '/calendar/render', params);
 
-        launchUrl(Uri.parse('https://www.google.com/calendar/render?'
-            'action=TEMPLATE'
-            '&text=${Uri.encodeComponent(eventData['SUMMARY']!)}'
-            '&dates=${DateFormat('yyyyMMdd').format(start)}/'
-            '${DateFormat('yyyyMMdd').format(end)}'
-            '&details=${Uri.encodeComponent(eventData['DESCRIPTION']!)}'
-            '&location=${Uri.encodeComponent(eventData['LOCATION']!)}'));
+        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+          _showSnackBar(context, 'Failed to open calendar');
+        }
+      } else {
+        _showSnackBar(context, 'No event found');
       }
     } catch (e) {
-      _showSnackBar(context, 'Error parsing calendar event: $e');
+      _showSnackBar(context, 'Error: ${e.toString()}');
     }
   }
 
