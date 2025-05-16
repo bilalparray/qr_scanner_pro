@@ -13,12 +13,14 @@ import 'package:intl/intl.dart';
 class ScanResultScreen extends StatelessWidget {
   final String content;
   final String format;
+  final String type;
   final DateTime timestamp;
 
   const ScanResultScreen({
     super.key,
     required this.content,
     required this.format,
+    required this.type,
     required this.timestamp,
   });
 
@@ -346,7 +348,9 @@ class ScanResultScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
-            onPressed: () => Share.share(content),
+            onPressed: () => SharePlus.instance.share(ShareParams(
+              text: content,
+            )),
           ),
         ],
       ),
@@ -355,9 +359,18 @@ class ScanResultScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoRow('Scan Type', format),
-            _buildInfoRow('Timestamp',
-                DateFormat('yyyy-MM-dd HH:mm:ss').format(timestamp)),
+            _buildInfoRow(
+              'Scan Type',
+              format,
+            ),
+            _buildInfoRow(
+              'Code Type',
+              type,
+            ),
+            _buildInfoRow(
+              'Timestamp',
+              DateFormat('yyyy-MM-dd HH:mm:ss').format(timestamp),
+            ),
             const SizedBox(height: 20),
             const Text(
               'Content:',
@@ -388,7 +401,10 @@ class ScanResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String title, String value) {
+  Widget _buildInfoRow(
+    String title,
+    String value,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

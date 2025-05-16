@@ -45,9 +45,12 @@ class _ResultSheetState extends State<ResultSheet> {
     final imagePath = File('${directory.path}/code.png');
     await imagePath.writeAsBytes(imageBytes);
 
-    final result = await Share.shareXFiles([XFile(imagePath.path)],
-        text: 'Shared code: $_codeData');
-
+    // final result = await Share.shareXFiles([XFile(imagePath.path)],
+    //     text: 'Shared code: $_codeData');
+    final result = await SharePlus.instance.share(ShareParams(
+      files: [XFile(imagePath.path)],
+      text: 'Shared code: $_codeData',
+    ));
     if (result.status == ShareResultStatus.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

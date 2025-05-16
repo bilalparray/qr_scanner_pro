@@ -135,6 +135,7 @@ class _ScanScreenState extends State<ScanScreen> {
         builder: (context) => ScanResultScreen(
           content: code,
           format: format.toString().split('.').last,
+          type: getQrType(code),
           timestamp: DateTime.now(),
         ),
       ),
@@ -208,5 +209,17 @@ class _ScanScreenState extends State<ScanScreen> {
         ),
       ),
     );
+  }
+
+  String getQrType(String data) {
+    if (data.startsWith('http')) return 'URL';
+    if (data.startsWith('BEGIN:VCARD')) return 'Contact';
+    if (data.startsWith('mailto:')) return 'Email';
+    if (data.startsWith('SMSTO:')) return 'SMS';
+    if (data.startsWith('WIFI:')) return 'WiFi';
+    if (data.startsWith('geo:')) return 'Location';
+    if (data.startsWith('tel:')) return 'Phone';
+    if (data.startsWith('BEGIN:VEVENT')) return 'Calendar Event';
+    return 'Text';
   }
 }
