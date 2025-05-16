@@ -245,7 +245,7 @@ class ScanResultScreen extends StatelessWidget {
             final status = await Permission.calendarFullAccess.request();
             return status.isGranted;
           }
-          return true; // iOS doesn't need runtime permission for calendar
+          return true;
         }
 
 // Usage in your handler:
@@ -270,13 +270,19 @@ class ScanResultScreen extends StatelessWidget {
   }
 
   void _handleLocation(BuildContext context) {
-    final geoPattern = RegExp(r'^geo:(-?\d+\.\d+),(-?\d+\.\d+)');
-    final match = geoPattern.firstMatch(content);
+    final geoPattern = RegExp(r'^geo:(-?\d+(\.\d+)?),(-?\d+(\.\d+)?)');
+    final match = geoPattern.firstMatch(content.trim());
+
     if (match != null) {
       final lat = match.group(1);
-      final lng = match.group(2);
-      launchUrl(Uri.parse(
-          'https://www.google.com/maps/search/?api=1&query=$lat,$lng'));
+      final lng = match.group(3); // Note: group(3) for second coordinate
+      final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+
+      launchUrl(Uri.parse(url));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid location format')),
+      );
     }
   }
 
