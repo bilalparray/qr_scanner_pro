@@ -58,7 +58,7 @@ dependencies:
   google_mlkit_barcode_scanning: ^0.14.1
   wifi_iot: ^0.3.19+2
   flutter_contacts: ^1.1.9+2
-
+  add_2_calendar: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

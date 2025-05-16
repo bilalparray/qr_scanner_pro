@@ -1,7 +1,10 @@
+import 'dart:io';
+
+import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as contacts;
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wifi_iot/wifi_iot.dart';
@@ -227,38 +230,43 @@ class ScanResultScreen extends StatelessWidget {
           return;
         }
 
-        // 5. Format for Google Calendar
-        String formatGoogleDate(DateTime dt) {
-          final date = DateFormat('yyyyMMdd').format(dt);
-          final time = DateFormat('HHmmss').format(dt);
-          return '${date}T${time}';
+        // 5. Create calendar event
+        final Event event = Event(
+          title: eventData['SUMMARY'] ?? 'Event',
+          description: eventData['DESCRIPTION'] ?? '',
+          location: eventData['LOCATION'] ?? '',
+          startDate: start,
+          endDate: end,
+          allDay:
+              !eventData['DTSTART']!.contains('T'), // Check if all-day event
+        );
+        Future<bool> _requestCalendarPermission() async {
+          if (Platform.isAndroid) {
+            final status = await Permission.calendarFullAccess.request();
+            return status.isGranted;
+          }
+          return true; // iOS doesn't need runtime permission for calendar
         }
 
-        final isAllDay = eventData['DTSTART']?.contains('T') != true;
-        final datesParam = isAllDay
-            ? '${DateFormat('yyyyMMdd').format(start)}/${DateFormat('yyyyMMdd').format(end)}'
-            : '${formatGoogleDate(start)}/${formatGoogleDate(end)}';
-
-        // 6. Build URL
-        final params = {
-          'action': 'TEMPLATE',
-          'text': Uri.encodeComponent(eventData['SUMMARY'] ?? 'Event'),
-          'dates': datesParam,
-          'details': Uri.encodeComponent(eventData['DESCRIPTION'] ?? ''),
-          'location': Uri.encodeComponent(eventData['LOCATION'] ?? ''),
-        };
-
-        final url = Uri.https('www.google.com', '/calendar/render', params);
-
-        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-          _showSnackBar(context, 'Failed to open calendar');
+// Usage in your handler:
+        if (!await _requestCalendarPermission()) {
+          _showSnackBar(context, 'Calendar permission denied');
+          return;
         }
+        // 6. Add to calendar
+        await Add2Calendar.addEvent2Cal(event);
       } else {
         _showSnackBar(context, 'No event found');
       }
     } catch (e) {
       _showSnackBar(context, 'Error: ${e.toString()}');
     }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   void _handleLocation(BuildContext context) {
@@ -309,15 +317,6 @@ class ScanResultScreen extends StatelessWidget {
     }
   }
   // endregion
-
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
