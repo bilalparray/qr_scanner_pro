@@ -215,11 +215,19 @@ class _ScanScreenState extends State<ScanScreen> {
     if (data.startsWith('http')) return 'URL';
     if (data.startsWith('BEGIN:VCARD')) return 'Contact';
     if (data.startsWith('mailto:')) return 'Email';
+    if (data.startsWith('MATMSG:')) return 'Email';
+    if (data.startsWith('SMTP:')) return 'Email';
+    if (data.startsWith('MECARD:')) return 'Contact';
+    if (data.startsWith('bitcoin:')) return 'Bitcoin';
+    if (data.startsWith('ethereum:')) return 'Ethereum';
     if (data.startsWith('SMSTO:')) return 'SMS';
+    if (data.startsWith('sms:')) return 'SMS';
     if (data.startsWith('WIFI:')) return 'WiFi';
     if (data.startsWith('geo:')) return 'Location';
     if (data.startsWith('tel:')) return 'Phone';
     if (data.startsWith('BEGIN:VEVENT')) return 'Calendar Event';
+    if (data.startsWith('BEGIN:VCALENDAR')) return 'Calendar Event';
+    if (data.startsWith('upi')) return 'UPI Payment';
     return 'Text';
   }
 }
