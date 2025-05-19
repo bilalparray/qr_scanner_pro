@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const ScanScreen(),
     const HistoryScreen(),
     const FavoritesScreen(),
-    const SettingsScreen(),
+    const SettingsPage(),
   ];
 
   @override
