@@ -65,7 +65,7 @@ class _ScanScreenState extends State<ScanScreen> {
       final rawValue = mlkitBarcode.rawValue ?? '';
       final format = _convertMlKitFormat(mlkitBarcode.format);
 
-      _handleScannedCode(rawValue, format);
+      _handleScannedCode(rawValue, format, mlkitBarcode);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -108,7 +108,8 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  Future<void> _handleScannedCode(String code, BarcodeFormat format) async {
+  Future<void> _handleScannedCode(
+      String code, BarcodeFormat format, dynamic scannedResult) async {
     if (!_isScanning) return;
     setState(() {
       _isScanning = false;
@@ -135,7 +136,7 @@ class _ScanScreenState extends State<ScanScreen> {
         builder: (context) => ScanResultScreen(
           content: code,
           format: format.toString().split('.').last,
-          type: getQrType(code),
+          type: getQrType(scannedResult),
           timestamp: DateTime.now(),
         ),
       ),
@@ -173,6 +174,7 @@ class _ScanScreenState extends State<ScanScreen> {
                 _handleScannedCode(
                   barcodes.first.rawValue ?? '',
                   barcodes.first.format,
+                  barcodes.first,
                 );
               }
             },
@@ -211,23 +213,89 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  String getQrType(String data) {
+  String getQrType(dynamic barcode) {
+    final data = barcode.rawValue ?? '';
+
+    // 1) First look at the semantic type:
+    switch (barcode.type) {
+      case BarcodeType.url:
+        return 'URL';
+      case BarcodeType.contactInfo:
+        return 'Contact';
+      case BarcodeType.email:
+        return 'Email';
+      case BarcodeType.phone:
+        return 'Phone';
+      case BarcodeType.sms:
+        return 'SMS';
+      case BarcodeType.wifi:
+        return 'WiFi';
+      case BarcodeType.geo:
+        return 'Location';
+      case BarcodeType.calendarEvent:
+        return 'Calendar Event';
+      case BarcodeType.isbn:
+        return 'ISBN';
+      case BarcodeType.driverLicense:
+        return 'Driver Licence';
+      // add other ML Kit `valueType`s if supported...
+      default:
+        break;
+    }
+
+    // 2) Fallback to checking prefixes (your original logic):
     if (data.startsWith('http')) return 'URL';
-    if (data.startsWith('BEGIN:VCARD')) return 'Contact';
     if (data.startsWith('mailto:')) return 'Email';
     if (data.startsWith('MATMSG:')) return 'Email';
     if (data.startsWith('SMTP:')) return 'Email';
-    if (data.startsWith('MECARD:')) return 'Contact';
+    if (data.startsWith('BEGIN:VCARD') || data.startsWith('MECARD:')) {
+      return 'Contact';
+    }
     if (data.startsWith('bitcoin:')) return 'Bitcoin';
     if (data.startsWith('ethereum:')) return 'Ethereum';
-    if (data.startsWith('SMSTO:')) return 'SMS';
-    if (data.startsWith('sms:')) return 'SMS';
+    if (data.startsWith('SMSTO:') || data.startsWith('sms:')) return 'SMS';
     if (data.startsWith('WIFI:')) return 'WiFi';
     if (data.startsWith('geo:')) return 'Location';
     if (data.startsWith('tel:')) return 'Phone';
-    if (data.startsWith('BEGIN:VEVENT')) return 'Calendar Event';
-    if (data.startsWith('BEGIN:VCALENDAR')) return 'Calendar Event';
-    if (data.startsWith('upi')) return 'UPI Payment';
-    return 'Text';
+    if (data.startsWith('BEGIN:VEVENT') || data.startsWith('BEGIN:VCALENDAR')) {
+      return 'Calendar Event';
+    }
+    if (data.startsWith('upi:') || // make sure to include the colon
+        data.startsWith('upi')) {
+      return 'UPI Payment';
+    }
+
+    // 3) Finally, fall back to the raw symbology format:
+    switch (barcode.type) {
+      case "product":
+        return 'Product';
+      case BarcodeFormat.code128:
+        return 'Code 128';
+      case BarcodeFormat.code39:
+        return 'Code 39';
+      case BarcodeFormat.code93:
+        return 'Code 93';
+      case BarcodeFormat.codabar:
+        return 'Codabar';
+      case BarcodeFormat.dataMatrix:
+        return 'Data Matrix';
+      case BarcodeFormat.ean13:
+        return 'EAN-13';
+      case BarcodeFormat.ean8:
+        return 'EAN-8';
+      case BarcodeFormat.itf:
+        return 'ITF';
+      case BarcodeFormat.pdf417:
+        return 'PDF417';
+      case BarcodeFormat.qrCode:
+        return 'QR Code';
+      case BarcodeFormat.upcA:
+        return 'UPC-A';
+      case BarcodeFormat.upcE:
+        return 'UPC-E';
+
+      default:
+        return 'Text';
+    }
   }
 }
