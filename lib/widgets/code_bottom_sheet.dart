@@ -117,7 +117,7 @@ class _ResultSheetState extends State<ResultSheet> {
               children: [
                 Screenshot(
                     controller: _screenshotController,
-                    child: widget.type == 'qr'
+                    child: (widget.type == 'qrCode' || widget.type == 'qr')
                         ? QrImageView(
                             data: _codeData,
                             size: 200,

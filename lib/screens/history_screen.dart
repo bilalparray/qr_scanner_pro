@@ -99,10 +99,9 @@ class HistoryScreen extends StatelessWidget {
                       ),
                       isScrollControlled: true,
                       builder: (context) => ResultSheet(
-                        result: entry.content,
-                        type: entry.type,
-                        format: entry.format ?? 'Code128',
-                      ),
+                          result: entry.content,
+                          type: entry.type,
+                          format: entry.type),
                     );
                   },
                 ),
