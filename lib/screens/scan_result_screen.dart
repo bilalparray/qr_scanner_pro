@@ -329,7 +329,7 @@ class ScanResultScreen extends StatelessWidget {
     final isUrl = Uri.tryParse(content)?.hasAbsolutePath ?? false;
     final isContact = content.startsWith('BEGIN:VCARD');
     final isWifi = content.startsWith('WIFI:');
-    final isSms = content.startsWith('SMSTO:');
+    final isSms = content.startsWith('SMSTO:') || content.startsWith('smsto:');
     final isPhone = content.startsWith('tel:');
     final isEmail = content.startsWith('mailto:') ||
         content.startsWith('MATMSG:') ||
