@@ -217,7 +217,6 @@ class ScanResultScreen extends StatelessWidget {
               return DateTime(year, month, day);
             }
           } catch (e) {
-            print('Date parsing failed: $dateStr');
             return null;
           }
         }
@@ -492,8 +491,8 @@ class ScanResultScreen extends StatelessWidget {
         _buildActionButton(
           icon: Icons.copy,
           label: 'Copy',
-          onPressed: () async {
-            await Clipboard.setData(ClipboardData(text: content));
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: content));
             _showSnackBar(context, 'Copied to clipboard');
           },
         ),

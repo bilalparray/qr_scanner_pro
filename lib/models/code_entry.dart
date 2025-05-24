@@ -15,13 +15,13 @@ class CodeEntry extends HiveObject {
   final DateTime timestamp;
 
   @HiveField(3)
-  final String? format; // For barcodes: 'code128', 'ean13', etc.
+  final String? format; // e.g. 'code128', 'ean13'
 
   @HiveField(4)
   bool isFavorite;
 
   @HiveField(5)
-  final String? title; // Optional title for the entry
+  final String? title;
 
   CodeEntry({
     required this.content,

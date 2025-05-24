@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qr_scanner/widgets/code_bottom_sheet.dart';
+
 import '../providers/code_provider.dart';
+import '../widgets/code_bottom_sheet.dart'; // Your custom bottom sheet widget
 
 class HistoryScreen extends StatelessWidget {
+  static const routeName = '/history';
+
   const HistoryScreen({super.key});
 
   @override
@@ -17,19 +20,19 @@ class HistoryScreen extends StatelessWidget {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
+                builder: (ctx) => AlertDialog(
                   title: const Text('Clear History'),
                   content:
                       const Text('Are you sure you want to clear all history?'),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(ctx),
                       child: const Text('Cancel'),
                     ),
                     TextButton(
                       onPressed: () {
                         context.read<CodeProvider>().clearHistory();
-                        Navigator.pop(context);
+                        Navigator.pop(ctx);
                       },
                       child: const Text('Clear'),
                     ),
@@ -41,7 +44,7 @@ class HistoryScreen extends StatelessWidget {
         ],
       ),
       body: Consumer<CodeProvider>(
-        builder: (context, provider, child) {
+        builder: (ctx, provider, child) {
           final history = provider.history;
 
           if (history.isEmpty) {
@@ -52,10 +55,10 @@ class HistoryScreen extends StatelessWidget {
 
           return ListView.builder(
             itemCount: history.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (ctx2, index) {
               final entry = history[index];
               return Dismissible(
-                key: Key(entry.timestamp.toString()),
+                key: ValueKey(entry.key),
                 background: Container(
                   color: Colors.red,
                   alignment: Alignment.centerRight,
@@ -87,21 +90,24 @@ class HistoryScreen extends StatelessWidget {
                       entry.isFavorite ? Icons.favorite : Icons.favorite_border,
                       color: entry.isFavorite ? Colors.red : null,
                     ),
-                    onPressed: () => provider.toggleFavorite(entry),
+                    onPressed: () {
+                      provider.toggleFavorite(entry);
+                    },
                   ),
                   onTap: () {
                     showModalBottomSheet(
-                      context: context,
+                      context: ctx2,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(16),
                         ),
                       ),
                       isScrollControlled: true,
-                      builder: (context) => ResultSheet(
-                          result: entry.content,
-                          type: entry.type,
-                          format: entry.type),
+                      builder: (_) => ResultSheet(
+                        result: entry.content,
+                        type: entry.type,
+                        format: entry.format ?? '',
+                      ),
                     );
                   },
                 ),
