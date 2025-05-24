@@ -31,6 +31,7 @@ class HistoryScreen extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
+                        // Clear everything in history and also its favorites flag
                         context.read<CodeProvider>().clearHistory();
                         Navigator.pop(ctx);
                       },
@@ -58,7 +59,7 @@ class HistoryScreen extends StatelessWidget {
             itemBuilder: (ctx2, index) {
               final entry = history[index];
               return Dismissible(
-                key: ValueKey(entry.key),
+                key: ValueKey(entry.key), // Unique key per entry
                 background: Container(
                   color: Colors.red,
                   alignment: Alignment.centerRight,
@@ -91,6 +92,8 @@ class HistoryScreen extends StatelessWidget {
                       color: entry.isFavorite ? Colors.red : null,
                     ),
                     onPressed: () {
+                      // This toggles both the history “isFavorite” flag
+                      // and adds/removes the clone in the favorites box.
                       provider.toggleFavorite(entry);
                     },
                   ),
