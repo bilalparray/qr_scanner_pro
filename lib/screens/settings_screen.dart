@@ -1,191 +1,230 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:qr_scanner/environment/environment.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // Keys for SharedPreferences
-  static const String _keyEnableFlash = 'enableFlash';
-  static const String _keyEnableSound = 'enableSound';
-  static const String _keyEnableVibration = 'enableVibration';
-  static const String _keyDarkMode = 'darkMode';
-  static const String _keySaveHistory = 'saveHistory';
-
-  // Local state variables
-  bool _enableFlash = false;
-  bool _enableSound = true;
-  bool _enableVibration = true;
-  bool _darkMode = false;
-  bool _saveHistory = true;
+  String _version = '';
+  String _buildNumber = '';
 
   @override
   void initState() {
     super.initState();
-    _loadPreferences();
+    _loadPackageInfo();
   }
 
-  Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _loadPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
     setState(() {
-      _enableFlash = prefs.getBool(_keyEnableFlash) ?? false;
-      _enableSound = prefs.getBool(_keyEnableSound) ?? true;
-      _enableVibration = prefs.getBool(_keyEnableVibration) ?? true;
-      _darkMode = prefs.getBool(_keyDarkMode) ?? false;
-      _saveHistory = prefs.getBool(_keySaveHistory) ?? true;
+      _version = info.version;
+      _buildNumber = info.buildNumber;
     });
   }
 
-  Future<void> _updatePreference(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(key, value);
-  }
-
-  void _clearScanHistory() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Scan history cleared')),
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid URL')),
+      );
+      return;
+    }
+    final opened = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
     );
+    if (!opened) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open ${uri.toString()}')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        backgroundColor: _darkMode ? Colors.grey[900] : theme.primaryColor,
-        iconTheme: IconThemeData(
-          color: _darkMode ? Colors.white : theme.primaryIconTheme.color,
-        ),
-        titleTextStyle: TextStyle(
-          color: _darkMode
-              ? Colors.white
-              : theme.primaryTextTheme.titleLarge?.color,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
+        centerTitle: true,
+        backgroundColor: theme.primaryColor,
+        foregroundColor: Colors.white,
       ),
-      body: Container(
-        color: _darkMode ? Colors.black : Colors.white,
-        child: ListView(
-          children: [
-            const SizedBox(height: 8),
-
-            // Flash Toggle
-            SwitchListTile(
-              title: const Text('Enable Flash'),
-              subtitle:
-                  const Text('Turn camera flashlight on/off during scanning'),
-              value: _enableFlash,
-              onChanged: (val) {
-                setState(() => _enableFlash = val);
-                _updatePreference(_keyEnableFlash, val);
-              },
-              secondary: const Icon(Icons.flash_on),
-              activeColor: Colors.blueAccent,
-              tileColor: _darkMode ? Colors.grey[850] : null,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        children: [
+          // App Header
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 48,
+                  backgroundColor: Colors.transparent,
+                  child: Image.asset(
+                    'assets/icon/icon.png',
+                    width: 96,
+                    height: 96,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'QR Scanner & Generator',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Text(
+                    'Scan and generate QR codes and barcodes with ease',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ),
+              ],
             ),
+          ),
+          const Divider(height: 32, thickness: 1),
 
-            const Divider(height: 1),
-
-            // Sound Toggle
-            SwitchListTile(
-              title: const Text('Enable Sound'),
-              subtitle: const Text('Play a beep sound after a successful scan'),
-              value: _enableSound,
-              onChanged: (val) {
-                setState(() => _enableSound = val);
-                _updatePreference(_keyEnableSound, val);
-              },
-              secondary: const Icon(Icons.volume_up),
-              activeColor: Colors.blueAccent,
-              tileColor: _darkMode ? Colors.grey[850] : null,
+          // App Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'App',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
+          ),
+          _buildSettingTile(
+            context,
+            icon: Icons.share,
+            title: 'Share App',
+            subtitle: 'Tell others about the app',
+            onTap: () {
+              SharePlus.instance.share(ShareParams(
+                  text:
+                      'Check out the Ultimate QR Scanner & Generator: ${Environment.playstoreUrl}'));
+            },
+          ),
+          _buildSettingTile(
+            context,
+            icon: Icons.system_update,
+            title: 'Check for Updates',
+            onTap: () {
+              _launchUrl(Environment.playstoreUrl);
+            },
+          ),
 
-            const Divider(height: 1),
-
-            // Vibration Toggle
-            SwitchListTile(
-              title: const Text('Enable Vibration'),
-              subtitle: const Text('Vibrate device after a successful scan'),
-              value: _enableVibration,
-              onChanged: (val) {
-                setState(() => _enableVibration = val);
-                _updatePreference(_keyEnableVibration, val);
-              },
-              secondary: const Icon(Icons.vibration),
-              activeColor: Colors.blueAccent,
-              tileColor: _darkMode ? Colors.grey[850] : null,
+          // Legal Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Legal',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
+          ),
+          _buildSettingTile(
+            context,
+            icon: Icons.privacy_tip,
+            title: 'Privacy Policy',
+            onTap: () {
+              _launchUrl(Environment.privacyPolicy);
+            },
+          ),
 
-            const Divider(height: 1),
-
-            // Save History Toggle
-            SwitchListTile(
-              title: const Text('Save Scan History'),
-              subtitle: const Text('Store scanned codes in history list'),
-              value: _saveHistory,
-              onChanged: (val) {
-                setState(() => _saveHistory = val);
-                _updatePreference(_keySaveHistory, val);
-              },
-              secondary: const Icon(Icons.history),
-              activeColor: Colors.blueAccent,
-              tileColor: _darkMode ? Colors.grey[850] : null,
+          // Support Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Support',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
+          ),
+          _buildSettingTile(
+            context,
+            icon: Icons.feedback,
+            title: 'Feedback & Review',
+            subtitle: 'Help us improve by leaving a review',
+            onTap: () {
+              _launchUrl(Environment.playstoreUrl);
+            },
+          ),
+          _buildSettingTile(
+            context,
+            icon: Icons.mail_outline,
+            title: 'Contact Support',
+            subtitle: 'Get in touch with our support team',
+            onTap: () {
+              _launchUrl('mailto:parraybilal34@gmail.com');
+            },
+          ),
 
-            const Divider(height: 1),
+          const Divider(height: 32, thickness: 1),
 
-            // Clear History Button
-            ListTile(
-              leading: const Icon(Icons.delete_forever),
-              title: const Text('Clear Scan History'),
-              subtitle: const Text('Remove all saved scan entries'),
-              onTap: _clearScanHistory,
-              tileColor: _darkMode ? Colors.grey[850] : null,
+          // Version Info
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Center(
+              child: Text(
+                'Version: $_version+$_buildNumber',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
 
-            const Divider(height: 1),
-
-            // Dark Mode Toggle
-            SwitchListTile(
-              title: const Text('Dark Mode'),
-              subtitle: const Text('Use dark theme throughout the app'),
-              value: _darkMode,
-              onChanged: (val) {
-                setState(() => _darkMode = val);
-                _updatePreference(_keyDarkMode, val);
-              },
-              secondary: const Icon(Icons.brightness_6),
-              activeColor: Colors.blueAccent,
-              tileColor: _darkMode ? Colors.grey[850] : null,
-            ),
-
-            const Divider(height: 1),
-
-            // About Section (optional)
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('About'),
-              subtitle: const Text('App version, developer info, licenses'),
-              onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'QR Scanner',
-                  applicationVersion: '1.0.0',
-                  applicationLegalese: '© 2025 My Company',
-                );
-              },
-              tileColor: _darkMode ? Colors.grey[850] : null,
-            ),
-
-            const SizedBox(height: 16),
-          ],
+  Widget _buildSettingTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).primaryColor, size: 24),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              )
+            : null,
+        trailing: trailing,
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
     );
   }
