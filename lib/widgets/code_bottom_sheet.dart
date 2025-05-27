@@ -36,6 +36,7 @@ class _ResultSheetState extends State<ResultSheet> {
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
     });
+    Navigator.of(context).pop();
   }
 
   Future<void> _shareImage() async {
@@ -46,20 +47,11 @@ class _ResultSheetState extends State<ResultSheet> {
     final imagePath = File('${directory.path}/code.png');
     await imagePath.writeAsBytes(imageBytes);
 
-    // final result = await Share.shareXFiles([XFile(imagePath.path)],
-    //     text: 'Shared code: $_codeData');
-    final result = await SharePlus.instance.share(ShareParams(
+    await SharePlus.instance.share(ShareParams(
       files: [XFile(imagePath.path)],
       text: 'Shared code: $_codeData',
     ));
-    if (result.status == ShareResultStatus.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Code shared successfully'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    Navigator.of(context).pop();
   }
 
   Future<void> _downloadImage() async {
