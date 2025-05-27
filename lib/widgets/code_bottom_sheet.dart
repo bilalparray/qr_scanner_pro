@@ -6,6 +6,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ResultSheet extends StatefulWidget {
   final String result;
@@ -62,19 +63,41 @@ class _ResultSheetState extends State<ResultSheet> {
   }
 
   Future<void> _downloadImage() async {
-    final imageBytes = await _screenshotController.capture();
-    if (imageBytes == null) return;
+    try {
+      // Capture image
+      final imageBytes = await _screenshotController.capture();
+      if (imageBytes == null) return;
 
-    final directory = await getDownloadsDirectory();
-    final imagePath = File('${directory?.path}/saved_code.png');
-    await imagePath.writeAsBytes(imageBytes);
+      // Get Downloads directory
+      Directory? directory;
+      if (Platform.isAndroid) {
+        directory = Directory('/storage/emulated/0/Download');
+      } else {
+        directory = await getDownloadsDirectory();
+      }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Image saved to Documents'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+      final filePath = '${directory?.path}/qr_scanner_image.png';
+      final imageFile = File(filePath);
+
+      // Save image
+      await imageFile.writeAsBytes(imageBytes);
+      Navigator.of(context).pop();
+
+      // Show confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Image saved to ${directory?.path}'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save image: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   @override
