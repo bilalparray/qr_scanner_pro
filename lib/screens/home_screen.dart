@@ -18,8 +18,8 @@ class _HomeScreenState extends State<HomeScreen> {
     const GenerateScreen(),
     const ScanScreen(),
     const HistoryScreen(),
-    const FavoritesScreen(),
     const SettingsPage(),
+    // const FavoritesScreen(),
   ];
 
   @override
@@ -51,10 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.history),
             label: 'History',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
+          // NavigationDestination(
+          //   icon: Icon(Icons.favorite),
+          //   label: 'Favorites',
+          // ),
           NavigationDestination(
             icon: Icon(Icons.settings),
             label: 'Settings',

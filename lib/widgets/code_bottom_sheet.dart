@@ -6,7 +6,6 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class ResultSheet extends StatefulWidget {
   final String result;
