@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,6 +30,12 @@ class _GenerateScreenState extends State<GenerateScreen> {
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _ssidController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _encryptionTypeController =
+      TextEditingController(text: 'WPA'); // Default value
+  final _latitudeController = TextEditingController();
+  final _longitudeController = TextEditingController();
 
   String _selectedType = 'qr';
   String _selectedFormat = 'code128';
@@ -40,8 +45,6 @@ class _GenerateScreenState extends State<GenerateScreen> {
   final int _errorCorrectionLevel = QrErrorCorrectLevel.M;
   bool _isGenerating = false;
   String? _generatedData;
-
-  final _barcode = Barcode.code128();
 
   @override
   void dispose() {
@@ -58,6 +61,11 @@ class _GenerateScreenState extends State<GenerateScreen> {
       _startDateController,
       _endDateController,
       _descriptionController,
+      _ssidController,
+      _passwordController,
+      _encryptionTypeController,
+      _latitudeController,
+      _longitudeController,
     ]) {
       c.dispose();
     }
@@ -79,30 +87,65 @@ class _GenerateScreenState extends State<GenerateScreen> {
         return '''
 BEGIN:VCARD
 VERSION:3.0
-FN:${_nameController.text}
-TEL:${_phoneController.text}
-EMAIL:${_emailController.text}
+FN:\${_nameController.text}
+TEL:\${_phoneController.text}
+EMAIL:\${_emailController.text}
 END:VCARD
 ''';
       case 'email':
-        return 'mailto:${_emailController.text}'
-            '?subject=${Uri.encodeComponent(_subjectController.text)}'
-            '&body=${Uri.encodeComponent(_messageController.text)}';
+        return 'mailto:\${_emailController.text}'
+            '?subject=\${Uri.encodeComponent(_subjectController.text)}'
+            '&body=\${Uri.encodeComponent(_messageController.text)}';
       case 'sms':
-        return 'sms:${_phoneController.text}'
-            '?body=${Uri.encodeComponent(_messageController.text)}';
+        return 'sms:\${_phoneController.text}'
+            '?body=\${Uri.encodeComponent(_messageController.text)}';
       case 'event':
         return '''
 BEGIN:VEVENT
-SUMMARY:${_eventNameController.text}
-LOCATION:${_locationController.text}
-DTSTART:${_startDateController.text}
-DTEND:${_endDateController.text}
-DESCRIPTION:${_descriptionController.text}
+SUMMARY:\${_eventNameController.text}
+LOCATION:\${_locationController.text}
+DTSTART:\${_startDateController.text}
+DTEND:\${_endDateController.text}
+DESCRIPTION:\${_descriptionController.text}
 END:VEVENT
 ''';
+      case 'wifi':
+        return 'WIFI:S:\${_ssidController.text};T:\${_encryptionTypeController.text};P:\${_passwordController.text};;';
+      case 'geo':
+        return 'geo:\${_latitudeController.text},\${_longitudeController.text}';
       default:
         return _contentController.text;
+    }
+  }
+
+  Barcode _getBarcodeFromFormat(String format) {
+    switch (format) {
+      case 'code128':
+        return Barcode.code128();
+      case 'code39':
+        return Barcode.code39();
+      case 'code93':
+        return Barcode.code93();
+      case 'codabar':
+        return Barcode.codabar();
+      case 'dataMatrix':
+        return Barcode.dataMatrix();
+      case 'ean13':
+        return Barcode.ean13();
+      case 'ean8':
+        return Barcode.ean8();
+      case 'itf':
+        return Barcode.itf();
+      case 'pdf417':
+        return Barcode.pdf417();
+      case 'qr':
+        return Barcode.qrCode();
+      case 'upca':
+        return Barcode.upcA();
+      case 'upce':
+        return Barcode.upcE();
+      default:
+        return Barcode.code128();
     }
   }
 
@@ -171,7 +214,7 @@ END:VEVENT
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('Error: \$e')),
         );
       }
     } finally {
@@ -287,6 +330,51 @@ END:VEVENT
             ),
           ],
         );
+      case 'wifi':
+        return Column(
+          children: [
+            TextFormField(
+              controller: _ssidController,
+              decoration: const InputDecoration(labelText: 'SSID'),
+              validator: (v) => (v?.isEmpty ?? true) ? 'Enter SSID' : null,
+            ),
+            TextFormField(
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: 'Password'),
+              validator: (v) => (v?.isEmpty ?? true) ? 'Enter password' : null,
+            ),
+            DropdownButtonFormField<String>(
+              value: _encryptionTypeController.text.isEmpty
+                  ? 'WPA'
+                  : _encryptionTypeController.text,
+              decoration: const InputDecoration(labelText: 'Encryption Type'),
+              items: const [
+                DropdownMenuItem(value: 'WPA', child: Text('WPA')),
+                DropdownMenuItem(value: 'WEP', child: Text('WEP')),
+                DropdownMenuItem(value: 'nopass', child: Text('No Password')),
+              ],
+              onChanged: (v) {
+                if (v != null)
+                  setState(() => _encryptionTypeController.text = v);
+              },
+            ),
+          ],
+        );
+      case 'geo':
+        return Column(
+          children: [
+            TextFormField(
+              controller: _latitudeController,
+              decoration: const InputDecoration(labelText: 'Latitude'),
+              validator: (v) => (v?.isEmpty ?? true) ? 'Enter latitude' : null,
+            ),
+            TextFormField(
+              controller: _longitudeController,
+              decoration: const InputDecoration(labelText: 'Longitude'),
+              validator: (v) => (v?.isEmpty ?? true) ? 'Enter longitude' : null,
+            ),
+          ],
+        );
       case 'text':
       default:
         return TextFormField(
@@ -345,6 +433,9 @@ END:VEVENT
                           DropdownMenuItem(value: 'sms', child: Text('SMS')),
                           DropdownMenuItem(
                               value: 'event', child: Text('Event')),
+                          DropdownMenuItem(value: 'wifi', child: Text('WiFi')),
+                          DropdownMenuItem(
+                              value: 'geo', child: Text('Geolocation')),
                         ],
                         onChanged: (v) {
                           if (v != null) setState(() => _selectedQrType = v);
@@ -361,8 +452,22 @@ END:VEVENT
                           DropdownMenuItem(
                               value: 'code128', child: Text('Code 128')),
                           DropdownMenuItem(
+                              value: 'code39', child: Text('Code 39')),
+                          DropdownMenuItem(
+                              value: 'code93', child: Text('Code 93')),
+                          DropdownMenuItem(
+                              value: 'codabar', child: Text('Codabar')),
+                          DropdownMenuItem(
+                              value: 'dataMatrix', child: Text('Data Matrix')),
+                          DropdownMenuItem(
                               value: 'ean13', child: Text('EAN-13')),
+                          DropdownMenuItem(value: 'ean8', child: Text('EAN-8')),
+                          DropdownMenuItem(value: 'itf', child: Text('ITF')),
+                          DropdownMenuItem(
+                              value: 'pdf417', child: Text('PDF417')),
+                          DropdownMenuItem(value: 'qr', child: Text('QR Code')),
                           DropdownMenuItem(value: 'upca', child: Text('UPC-A')),
+                          DropdownMenuItem(value: 'upce', child: Text('UPC-E')),
                         ],
                         onChanged: (v) {
                           if (v != null) setState(() => _selectedFormat = v);
@@ -377,7 +482,6 @@ END:VEVENT
                       ),
                     ],
                     const SizedBox(height: 16),
-                    // color pickers, logo picker, error level, generate button...
                     ElevatedButton(
                       onPressed: _isGenerating ? null : _generateCode,
                       child: _isGenerating
@@ -404,7 +508,7 @@ END:VEVENT
                                     size: Size(40, 40)),
                               )
                             : BarcodeWidget(
-                                barcode: _barcode,
+                                barcode: _getBarcodeFromFormat(_selectedFormat),
                                 data: _generatedData!,
                                 width: 200,
                                 height: 80,
