@@ -66,8 +66,8 @@ class _ResultSheetState extends State<ResultSheet> {
       } else {
         directory = await getDownloadsDirectory();
       }
-
-      final filePath = '${directory?.path}/qr_scanner_image.png';
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filePath = '${directory?.path}/qr_$timestamp.png';
       final imageFile = File(filePath);
 
       // Save image
