@@ -3,7 +3,6 @@ import 'package:qr_scanner/screens/settings_screen.dart';
 import 'generate_screen.dart';
 import 'scan_screen.dart';
 import 'history_screen.dart';
-import 'favorites_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

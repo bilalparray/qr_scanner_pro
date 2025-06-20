@@ -127,9 +127,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
       await provider.addEntry(entry);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Saved successfully!')),
-      );
+
       showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
