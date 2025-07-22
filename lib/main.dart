@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:qr_scanner/screens/generate_screen.dart';
 import 'package:qr_scanner/screens/home_screen.dart';
 
 import 'models/code_entry.dart';
