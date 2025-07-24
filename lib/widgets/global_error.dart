@@ -1,5 +1,3 @@
-// ==================== ERROR HANDLING CLASSES ====================
-
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';

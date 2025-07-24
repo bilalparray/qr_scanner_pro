@@ -2,7 +2,7 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   add_2_calendar:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: add_2_calendar
       sha256: "8d7a82aba607d35f2a5bc913419e12f865a96a350a8ad2509a59322bc161f200"
@@ -135,7 +135,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_contacts:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_contacts
       sha256: "388d32cd33f16640ee169570128c933b45f3259bddbfae7a100bb49e5ffea9ae"
@@ -169,7 +169,7 @@ packages:
     source: sdk
     version: "0.0.0"
   google_mlkit_barcode_scanning:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: google_mlkit_barcode_scanning
       sha256: b38505df2d3fdf7830979d60fee55039c2f442d189b2e06fcb2fe494ba65d0db
@@ -185,7 +185,7 @@ packages:
     source: hosted
     version: "0.11.0"
   google_mobile_ads:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: google_mobile_ads
       sha256: a4f59019f2c32769fb6c60ed8aa321e9c21a36297e2c4f23452b3e779a3e7a26
@@ -209,7 +209,7 @@ packages:
     source: hosted
     version: "4.1.2"
   image_picker:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: image_picker
       sha256: "021834d9c0c3de46bf0fe40341fa07168407f694d9b2bb18d532dc1261867f7a"
@@ -273,7 +273,7 @@ packages:
     source: hosted
     version: "0.2.1+1"
   intl:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: intl
       sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
@@ -345,7 +345,7 @@ packages:
     source: hosted
     version: "2.0.0"
   mobile_scanner:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: mobile_scanner
       sha256: "54005bdea7052d792d35b4fef0f84ec5ddc3a844b250ecd48dc192fb9b4ebc95"
@@ -353,7 +353,7 @@ packages:
     source: hosted
     version: "7.0.1"
   package_info_plus:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: package_info_plus
       sha256: "7976bfe4c583170d6cdc7077e3237560b364149fcd268b5f53d95a991963b191"
@@ -377,7 +377,7 @@ packages:
     source: hosted
     version: "1.9.1"
   path_provider:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -425,7 +425,7 @@ packages:
     source: hosted
     version: "2.3.0"
   permission_handler:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: permission_handler
       sha256: bc917da36261b00137bbc8896bf1482169cd76f866282368948f032c8c1caae1
@@ -497,7 +497,7 @@ packages:
     source: hosted
     version: "3.0.2"
   qr_flutter:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: qr_flutter
       sha256: "5095f0fc6e3f71d08adef8feccc8cea4f12eec18a2e31c2e8d82cb6019f4b097"
@@ -505,7 +505,7 @@ packages:
     source: hosted
     version: "4.1.0"
   share_plus:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: share_plus
       sha256: b2961506569e28948d75ec346c28775bb111986bb69dc6a20754a457e3d97fa0
@@ -566,7 +566,7 @@ packages:
     source: hosted
     version: "1.4.1"
   syncfusion_flutter_barcodes:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: syncfusion_flutter_barcodes
       sha256: "33b3a5dc7243f51c8d0b14fa717b77e57d3d28100ee2de6514827d95b4342ede"
@@ -606,7 +606,7 @@ packages:
     source: hosted
     version: "1.4.0"
   url_launcher:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
@@ -734,7 +734,7 @@ packages:
     source: hosted
     version: "3.22.1"
   wifi_iot:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: wifi_iot
       sha256: "0861aed0c0afd6031b4337811d31cdd181c594a8a2c73e94826ea21d2cb4707b"

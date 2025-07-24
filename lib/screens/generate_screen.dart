@@ -1,4 +1,3 @@
-// ==================== HOME PAGE ====================
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
@@ -10,7 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/models/generate_code.dart';
-import 'package:qr_scanner/widgets/globalerrro.dart';
+import 'package:qr_scanner/widgets/barcode-viewer.dart';
+import 'package:qr_scanner/widgets/color-picker.dart';
+import 'package:qr_scanner/widgets/global_error.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
@@ -678,19 +679,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
     if (_generatedBarcode == null) return;
 
     try {
-      // if (await Permission.storage.isDenied) {
-      //   final status = await Permission.storage.request();
-      //   if (!status.isGranted) {
-      //     if (mounted) {
-      //       GlobalErrorHandler.showErrorSnackBar(
-      //         context,
-      //         'Storage permission required to save barcode',
-      //       );
-      //     }
-      //     return;
-      //   }
-      // }
-
       final imageBytes = await _captureBarcode();
       if (imageBytes == null) {
         if (mounted) {
@@ -1723,169 +1711,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
           ),
         );
       },
-    );
-  }
-}
-
-// ==================== BARCODE VIEWER PAGE ====================
-
-class BarcodeViewerPage extends StatelessWidget {
-  final Widget barcode;
-  final String title;
-  final Color foregroundColor;
-  final Color backgroundColor;
-
-  const BarcodeViewerPage({
-    super.key,
-    required this.barcode,
-    required this.title,
-    this.foregroundColor = Colors.black,
-    this.backgroundColor = Colors.white,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: InteractiveViewer(
-            minScale: 0.5,
-            maxScale: 10.0,
-            child: Container(padding: const EdgeInsets.all(20), child: barcode),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).pop(),
-        backgroundColor: Colors.black87,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.close),
-      ),
-    );
-  }
-}
-
-// ==================== ENHANCED COLOR PICKER ====================
-
-class EnhancedColorPicker extends StatelessWidget {
-  final Color pickerColor;
-  final ValueChanged<Color> onColorChanged;
-
-  const EnhancedColorPicker({
-    super.key,
-    required this.pickerColor,
-    required this.onColorChanged,
-  });
-
-  static const List<List<Color>> _colorGroups = [
-    // Basic colors
-    [Colors.black, Colors.white, Colors.grey, Colors.red, Colors.pink],
-    [
-      Colors.purple,
-      Colors.deepPurple,
-      Colors.indigo,
-      Colors.blue,
-      Colors.lightBlue,
-    ],
-    [Colors.cyan, Colors.teal, Colors.green, Colors.lightGreen, Colors.lime],
-    [
-      Colors.yellow,
-      Colors.amber,
-      Colors.orange,
-      Colors.deepOrange,
-      Colors.brown,
-    ],
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Current color display
-          Container(
-            height: 60,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: pickerColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade400, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                'Selected Color',
-                style: TextStyle(
-                  color: pickerColor.computeLuminance() > 0.5
-                      ? Colors.black
-                      : Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Color grid
-          ..._colorGroups.map((group) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: group.map((color) {
-                  final isSelected = pickerColor == color;
-                  return GestureDetector(
-                    onTap: () => onColorChanged(color),
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color:
-                              isSelected ? Colors.blue : Colors.grey.shade400,
-                          width: isSelected ? 3 : 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 2,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: isSelected
-                          ? Icon(
-                              Icons.check,
-                              color: color.computeLuminance() > 0.5
-                                  ? Colors.black
-                                  : Colors.white,
-                            )
-                          : null,
-                    ),
-                  );
-                }).toList(),
-              ),
-            );
-          }).toList(),
-        ],
-      ),
     );
   }
 }
