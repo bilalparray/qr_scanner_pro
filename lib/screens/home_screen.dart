@@ -13,10 +13,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final List<Widget> _screens = [
-    const BarcodeHomePage(),
     const ScanScreen(),
+    const BarcodeHomePage(),
     const SettingsPage(),
-    // const FavoritesScreen(),
   ];
 
   @override
@@ -37,21 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.qr_code),
-            label: 'Generate',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.qr_code_scanner),
             label: 'Scan',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: Icon(Icons.qr_code),
+            label: 'Generate',
           ),
-          // NavigationDestination(
-          //   icon: Icon(Icons.favorite),
-          //   label: 'Favorites',
-          // ),
           NavigationDestination(
             icon: Icon(Icons.settings),
             label: 'Settings',

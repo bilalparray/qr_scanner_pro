@@ -972,7 +972,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                         ),
                       ] else ...[
                         ...inputFields.asMap().entries.map((entry) {
-                          final index = entry.key;
                           final field = entry.value;
 
                           return Padding(

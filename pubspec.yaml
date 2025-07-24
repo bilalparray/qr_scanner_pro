@@ -13,56 +13,25 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  barcode: ^2.2.9
-  image_picker: ^1.1.2
-  provider: ^6.1.5
-  google_mobile_ads: ^6.0.0
-  flutter_dotenv: ^5.2.1
-  url_launcher: ^6.3.1
-  clipboard: ^0.1.3
-  intl: ^0.20.2
-  flutter_svg: ^2.1.0
-  barcode_widget: ^2.0.4
-  screenshot: ^3.0.0
-  flutter_launcher_icons: ^0.14.3
-  google_mlkit_barcode_scanning: ^0.14.1
-  wifi_iot: ^0.3.19+2
-  flutter_contacts: ^1.1.9+2
-  add_2_calendar: ^3.0.1
-  shared_preferences: ^2.5.3
-  package_info_plus:
-    ^8.3.0
-    # Barcode & QR Code Generation (Latest stable versions as of July 2025)
-  syncfusion_flutter_barcodes: ^30.1.40 # Production-ready, comprehensive barcode support
-  qr_flutter: ^4.1.0 # QR code generation with null safety
-  mobile_scanner: ^7.0.1 # Modern scanner (for future scanning features)
-
-  # Core utilities with null safety
-  cupertino_icons: ^1.0.6
-
-  # File handling & sharing
-  path_provider: ^2.1.3
-  share_plus: ^11.0.0
-  permission_handler: ^12.0.1
-
-  # Image processing
-  image: ^4.2.0
-
-  # UI enhancements
-  flutter_colorpicker: ^1.1.0
-
-  # State management
-  flutter_bloc: ^8.1.6
-  equatable: ^2.0.5
-
-  # Error handling and utilities
-  dartz: ^0.10.1
-  uuid: ^4.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  qr_flutter: ^4.1.0
+  path_provider: ^2.1.3
+  share_plus: ^11.0.0
+  google_mobile_ads: ^6.0.0
+  url_launcher: ^6.3.1
+  syncfusion_flutter_barcodes: ^30.1.40
+  package_info_plus: ^8.3.0
+  add_2_calendar: ^3.0.1
+  flutter_contacts: ^1.1.9+2
+  permission_handler: ^12.0.1
+  intl: ^0.20.2
+  wifi_iot: ^0.3.19+2
+  mobile_scanner: ^7.0.1
+  image_picker: ^1.1.2
+  google_mlkit_barcode_scanning: ^0.14.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -70,8 +39,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  hive_generator: ^2.0.1
-  build_runner: ^2.4.6
 
 flutter_launcher_icons:
   android: "launcher_icon"
