@@ -28,19 +28,87 @@ enum BarcodeCodeType {
     BarcodeCategory.qrCodes,
     'MyWiFi',
   ),
-  qrCodeVCard(
-    'QR vCard',
-    'Contact information QR',
-    BarcodeCategory.qrCodes,
-    'John Doe',
-  ),
+
   microQR(
     'Micro QR',
     'Compact QR for small data',
     BarcodeCategory.qrCodes,
     '12345',
   ),
+  // Additional QR types
 
+  // SMS QR code (phone number and optionally message)
+  qrCodeSms(
+    'QR SMS',
+    'SMS message QR',
+    BarcodeCategory.qrCodes,
+    'SMSTO:+1234567890:Hello from QR!',
+  ),
+
+  // Email QR code (email with subject and body)
+  qrCodeEmail(
+    'QR Email',
+    'Email QR',
+    BarcodeCategory.qrCodes,
+    'mailto:example@example.com?subject=Hello&body=This%20is%20a%20test',
+  ),
+
+  // PDF QR code (assuming link to PDF)
+  qrCodePDF(
+    'QR PDF',
+    'PDF document link QR',
+    BarcodeCategory.qrCodes,
+    'https://www.example.com/myfile.pdf',
+  ),
+
+  // Multi-URL QR code (custom format or concatenated URLs - optional)
+  qrCodeMultiURl(
+    'QR Multi-URL',
+    'Multiple URLs in one QR (comma-separated or custom)',
+    BarcodeCategory.qrCodes,
+    'https://example1.com,https://example2.com',
+  ),
+
+  // Contact QR code (like vCard but you might want a different detail)
+  qrCodeVCard(
+    'QR Contact',
+    'Contact info QR',
+    BarcodeCategory.qrCodes,
+    '''
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;Jane;;;
+FN:Jane Doe
+ORG:Company;
+TEL;TYPE=WORK,VOICE:+1234567890
+EMAIL:jane.doe@example.com
+END:VCARD
+''',
+  ),
+
+  // Geolocation QR code (latitude and longitude)
+  qrCodeGeo(
+    'QR Geo',
+    'Geolocation QR',
+    BarcodeCategory.qrCodes,
+    'geo:37.7749,-122.4194',
+  ),
+
+  // App QR code (e.g., link to app store or deep link)
+  qrCodeAPP(
+    'QR App',
+    'App download or deep link QR',
+    BarcodeCategory.qrCodes,
+    'https://play.google.com/store/apps/details?id=com.example.app',
+  ),
+
+  // Phone QR code (Call phone number)
+  qrCodePhone(
+    'QR Phone',
+    'Phone call QR',
+    BarcodeCategory.qrCodes,
+    'TEL:+1234567890',
+  ),
   // 1D Linear Barcodes
   code128(
     'Code 128',

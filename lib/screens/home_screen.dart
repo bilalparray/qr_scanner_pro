@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:qr_scanner/screens/settings_screen.dart';
 import 'generate_screen.dart';
 import 'scan_screen.dart';
-import 'history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,7 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const BarcodeHomePage(),
     const ScanScreen(),
-    const HistoryScreen(),
     const SettingsPage(),
     // const FavoritesScreen(),
   ];

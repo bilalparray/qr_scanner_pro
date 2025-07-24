@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart'
     as mlkit;
-import '../providers/code_provider.dart';
-import '../models/code_entry.dart';
 import 'scan_result_screen.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -118,15 +115,6 @@ class _ScanScreenState extends State<ScanScreen> {
         _controller.toggleTorch();
       }
     });
-
-    final entry = CodeEntry(
-      content: code,
-      type: format.toString().split('.').last,
-      timestamp: DateTime.now(),
-      format: format.toString(),
-    );
-
-    await context.read<CodeProvider>().addEntry(entry);
 
     if (!mounted) return;
 
