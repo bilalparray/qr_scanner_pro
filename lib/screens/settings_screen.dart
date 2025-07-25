@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qr_scanner/environment/environment.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:qr_scanner/widgets/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -115,9 +115,9 @@ class _SettingsPageState extends State<SettingsPage> {
             title: 'Share App',
             subtitle: 'Tell others about the app',
             onTap: () {
-              SharePlus.instance.share(ShareParams(
+              shareContent(
                   text:
-                      'Check out the Ultimate QR Scanner & Generator: ${Environment.playstoreUrl}'));
+                      'Check out the Ultimate QR Scanner & Generator: ${Environment.playstoreUrl}');
             },
           ),
           _buildSettingTile(

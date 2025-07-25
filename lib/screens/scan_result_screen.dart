@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as contacts;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:qr_scanner/widgets/share.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wifi_iot/wifi_iot.dart';
@@ -345,11 +346,8 @@ class ScanResultScreen extends StatelessWidget {
         title: const Text('Scan Result'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => SharePlus.instance.share(ShareParams(
-              text: content,
-            )),
-          ),
+              icon: const Icon(Icons.share),
+              onPressed: () => shareContent(text: content)),
         ],
       ),
       body: SingleChildScrollView(

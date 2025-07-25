@@ -8,10 +8,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/widgets/barcode-viewer.dart';
 import 'package:qr_scanner/widgets/color-picker.dart';
 import 'package:qr_scanner/widgets/global_error.dart';
+import 'package:qr_scanner/widgets/share.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
@@ -655,9 +657,10 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
       );
       await file.writeAsBytes(imageBytes);
 
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], text: 'Generated ${_selectedType.displayName}');
+      shareContent(
+          text:
+              'Generated Barcode ${_selectedType.displayName}\n\n Download our App ${Environment.playstoreUrl}',
+          files: [XFile(file.path)]);
 
       if (mounted) {
         GlobalErrorHandler.showSuccessSnackBar(
@@ -797,7 +800,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -861,12 +865,13 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer.withOpacity(
-                            0.3,
+                          color: theme.colorScheme.primaryContainer.withValues(
+                            alpha: 0.3,
                           ),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: theme.colorScheme.primary.withOpacity(0.3),
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
@@ -912,8 +917,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.secondary.withOpacity(
-                                0.1,
+                              color: theme.colorScheme.secondary.withValues(
+                                alpha: 0.1,
                               ),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -1053,8 +1058,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.tertiary.withOpacity(
-                                0.1,
+                              color: theme.colorScheme.tertiary.withValues(
+                                alpha: 0.1,
                               ),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -1129,8 +1134,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.1,
+                                            color: Colors.black.withValues(
+                                              alpha: 0.1,
                                             ),
                                             blurRadius: 2,
                                             offset: const Offset(0, 1),
@@ -1205,8 +1210,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.1,
+                                            color: Colors.black.withValues(
+                                              alpha: 0.1,
                                             ),
                                             blurRadius: 2,
                                             offset: const Offset(0, 1),
@@ -1311,8 +1316,9 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceVariant.withOpacity(
-                              0.3,
+                            color: theme.colorScheme.surfaceContainerHighest
+                                .withValues(
+                              alpha: 0.3,
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -1375,12 +1381,12 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                   gradient: LinearGradient(
                     colors: [
                       theme.colorScheme.primary,
-                      theme.colorScheme.primary.withOpacity(0.8),
+                      theme.colorScheme.primary.withValues(alpha: 0.8),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.3),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -1478,7 +1484,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -1539,7 +1545,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer
-                                  .withOpacity(0.5),
+                                  .withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -1639,12 +1645,13 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 Theme.of(context).colorScheme.primaryContainer,
                 Theme.of(
                   context,
-                ).colorScheme.primaryContainer.withOpacity(0.7),
+                ).colorScheme.primaryContainer.withValues(alpha: 0.7),
               ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             ),
           ),
           child: Column(
