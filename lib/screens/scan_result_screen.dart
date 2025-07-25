@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as contacts;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:qr_scanner/widgets/global_error.dart';
 import 'package:qr_scanner/widgets/share.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 import 'package:intl/intl.dart';
@@ -29,13 +29,16 @@ class ScanResultScreen extends StatelessWidget {
     try {
       final contact = contacts.Contact.fromVCard(content);
       if (!await contacts.FlutterContacts.requestPermission()) {
-        _showSnackBar(context, 'Contact permission denied');
+        GlobalErrorHandler.showErrorSnackBar(
+            context, 'Contact permission denied');
+
         return;
       }
       await contact.insert();
-      _showSnackBar(context, 'Contact saved successfully');
+      GlobalErrorHandler.showSuccessSnackBar(
+          context, 'Contact saved successfully');
     } catch (e) {
-      _showSnackBar(context, 'Error saving contact: $e');
+      GlobalErrorHandler.showErrorSnackBar(context, 'Error saving contact: $e');
     }
   }
 
@@ -75,7 +78,8 @@ class ScanResultScreen extends StatelessWidget {
       final hidden = match.group(4) == 'true';
 
       if (ssid == null || ssid.isEmpty) {
-        _showSnackBar(context, 'SSID is missing in the WiFi QR code');
+        GlobalErrorHandler.showErrorSnackBar(context, 'SSID is missing');
+
         return;
       }
 
@@ -94,14 +98,18 @@ class ScanResultScreen extends StatelessWidget {
           withInternet: true,
           isHidden: hidden,
         );
-
-        _showSnackBar(context,
-            connected ? 'Connected to $ssid' : 'Failed to connect to $ssid');
+        GlobalErrorHandler.showSuccessSnackBar(
+          context,
+          connected ? 'Connected to $ssid' : 'Failed to connect to $ssid',
+        );
       } catch (e) {
-        _showSnackBar(context, 'Error connecting to WiFi: $e');
+        GlobalErrorHandler.showErrorSnackBar(
+          context,
+          'Error connecting to WiFi: $e',
+        );
       }
     } else {
-      _showSnackBar(context, 'Invalid WiFi QR code format');
+      GlobalErrorHandler.showErrorSnackBar(context, 'Invalid WiFi format');
     }
   }
 
@@ -149,10 +157,11 @@ class ScanResultScreen extends StatelessWidget {
       if (uri != null) {
         launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showSnackBar(context, 'Unsupported email format');
+        GlobalErrorHandler.showErrorSnackBar(
+            context, 'Unsupported email format');
       }
     } catch (e) {
-      _showSnackBar(context, 'Failed to open email app: $e');
+      GlobalErrorHandler.showErrorSnackBar(context, 'Failed to open email app');
     }
   }
 
@@ -227,7 +236,11 @@ class ScanResultScreen extends StatelessWidget {
         final end = parseDate(eventData['DTEND']);
 
         if (start == null || end == null) {
-          _showSnackBar(context, 'Invalid start/end dates');
+          GlobalErrorHandler.showErrorSnackBar(
+            context,
+            'Invalid start/end dates',
+          );
+
           return;
         }
 
@@ -241,7 +254,7 @@ class ScanResultScreen extends StatelessWidget {
           allDay:
               !eventData['DTSTART']!.contains('T'), // Check if all-day event
         );
-        Future<bool> _requestCalendarPermission() async {
+        Future<bool> requestCalendarPermission() async {
           if (Platform.isAndroid) {
             final status = await Permission.calendarFullAccess.request();
             return status.isGranted;
@@ -250,24 +263,22 @@ class ScanResultScreen extends StatelessWidget {
         }
 
 // Usage in your handler:
-        if (!await _requestCalendarPermission()) {
-          _showSnackBar(context, 'Calendar permission denied');
+        if (!await requestCalendarPermission()) {
+          GlobalErrorHandler.showErrorSnackBar(
+            context,
+            'Calendar permission denied',
+          );
+
           return;
         }
         // 6. Add to calendar
         await Add2Calendar.addEvent2Cal(event);
       } else {
-        _showSnackBar(context, 'No event found');
+        GlobalErrorHandler.showErrorSnackBar(context, 'No event found');
       }
     } catch (e) {
-      _showSnackBar(context, 'Error: ${e.toString()}');
+      GlobalErrorHandler.showErrorSnackBar(context, 'Error: ${e.toString()}');
     }
-  }
-
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
   }
 
   void _handleLocation(BuildContext context) {
@@ -306,13 +317,23 @@ class ScanResultScreen extends StatelessWidget {
         ..notes = [contacts.Note(data['NOTE'] ?? '')];
 
       if (!await contacts.FlutterContacts.requestPermission()) {
-        _showSnackBar(context, 'Contact permission denied');
+        GlobalErrorHandler.showErrorSnackBar(
+          context,
+          'Contact permission denied',
+        );
+
         return;
       }
       await contact.insert();
-      _showSnackBar(context, 'MeCard contact saved');
+      GlobalErrorHandler.showSuccessSnackBar(
+        context,
+        'MeCard contact saved',
+      );
     } catch (e) {
-      _showSnackBar(context, 'Error saving MeCard: $e');
+      GlobalErrorHandler.showErrorSnackBar(
+        context,
+        'Error saving MeCard: $e',
+      );
     }
   }
 
@@ -320,7 +341,10 @@ class ScanResultScreen extends StatelessWidget {
     final cryptoPattern = RegExp(r'^(bitcoin|ethereum):.+');
     if (cryptoPattern.hasMatch(content)) {
       Clipboard.setData(ClipboardData(text: content));
-      _showSnackBar(context, 'Crypto address copied');
+      GlobalErrorHandler.showSuccessSnackBar(
+        context,
+        'Crypto address copied',
+      );
     }
   }
   // endregion
@@ -491,7 +515,10 @@ class ScanResultScreen extends StatelessWidget {
           label: 'Copy',
           onPressed: () {
             Clipboard.setData(ClipboardData(text: content));
-            _showSnackBar(context, 'Copied to clipboard');
+            GlobalErrorHandler.showSuccessSnackBar(
+              context,
+              'Copied to clipboard',
+            );
           },
         ),
       ],
