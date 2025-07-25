@@ -1,9 +1,8 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/models/generate_code.dart';
+import 'package:qr_scanner/screens/settings_screen.dart';
 import 'package:qr_scanner/utils/barcode_utils.dart';
 import 'package:qr_scanner/widgets/barcode-viewer.dart';
 import 'package:qr_scanner/widgets/barcode_customisation.dart';
@@ -328,7 +327,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   Widget build(BuildContext context) {
     final inputFields = BarcodeInputField.configForType(_selectedType);
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -341,19 +340,9 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
         ),
         actions: [
           IconButton(
-            onPressed: () => showAboutDialog(
-              context: context,
-              applicationName: 'Barcode & QR Generator',
-              applicationVersion: '1.0.0',
-              applicationIcon: const Icon(Icons.qr_code_2),
-              children: const [
-                Text(
-                  'Professional Barcode & QR Code Generator\nSupports 25+ barcode types with dynamic validation and customization.',
-                ),
-              ],
-            ),
-            icon: const Icon(Icons.info_outline),
-          ),
+              icon: const Icon(Icons.settings),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const SettingsPage())))
         ],
       ),
       body: SafeArea(
@@ -399,22 +388,25 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 onWidthChanged: (width) {
                   setState(() {
                     _barcodeWidth = width;
-                    if (_generatedBarcode != null)
+                    if (_generatedBarcode != null) {
                       _generatedBarcode = _buildBarcodeWidget();
+                    }
                   });
                 },
                 onHeightChanged: (height) {
                   setState(() {
                     _barcodeHeight = height;
-                    if (_generatedBarcode != null)
+                    if (_generatedBarcode != null) {
                       _generatedBarcode = _buildBarcodeWidget();
+                    }
                   });
                 },
                 onShowValueChanged: (show) {
                   setState(() {
                     _showValue = show;
-                    if (_generatedBarcode != null)
+                    if (_generatedBarcode != null) {
                       _generatedBarcode = _buildBarcodeWidget();
+                    }
                   });
                 },
                 isShowValueEnabled: !_selectedType.isQR && !_selectedType.is2D,
@@ -447,10 +439,10 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                   child: BarcodePreview(
                     barcodeKey: _barcodeKey,
                     backgroundColor: _backgroundColor,
-                    child: _generatedBarcode!,
                     onShare: _shareBarcode,
                     onSave: _downloadBarcode,
                     onViewFullScreen: _viewBarcodeFullScreen,
+                    child: _generatedBarcode!,
                   ),
                 ),
             ],
