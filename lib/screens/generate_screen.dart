@@ -357,13 +357,12 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 selectedType: _selectedType,
                 onTypeChanged: _onBarcodeTypeChanged,
               ),
-              const SizedBox(height: 16),
+
               BarcodeInputFields(
                 inputFields: inputFields,
                 controllers: _controllers,
                 onChange: () => setState(() => _generatedBarcode = null),
               ),
-              const SizedBox(height: 16),
               BarcodeCustomization(
                 foregroundColor: _foregroundColor,
                 backgroundColor: _backgroundColor,
@@ -412,7 +411,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 },
                 isShowValueEnabled: !_selectedType.isQR && !_selectedType.is2D,
               ),
-              const SizedBox(height: 24),
+              // const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _isGenerating ? null : _generateBarcode,
                 icon: _isGenerating

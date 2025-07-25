@@ -69,21 +69,16 @@ class BarcodeCustomization extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.tertiary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+            Text(
+              'Customization',
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
               ),
-              child: Icon(Icons.palette_outlined,
-                  color: theme.colorScheme.tertiary),
-            ),
-            const SizedBox(width: 12),
-            Text('Customization',
-                style: theme.textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold))
+            )
           ]),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -108,9 +103,14 @@ class BarcodeCustomization extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          Text('Size Controls',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            'Size Controls',
+            style: TextStyle(
+              color: theme.colorScheme.primary,
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
           Row(
             children: [

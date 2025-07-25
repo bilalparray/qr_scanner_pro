@@ -20,20 +20,13 @@ class BarcodeTypeSelector extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(selectedType.category.icon,
-                  color: theme.colorScheme.primary),
-            ),
-            const SizedBox(width: 12),
             Text(
               'Select Barcode Type',
-              style: theme.textTheme.headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
             )
           ]),
           const SizedBox(height: 10),

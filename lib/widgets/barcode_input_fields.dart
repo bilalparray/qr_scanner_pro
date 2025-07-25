@@ -67,21 +67,16 @@ class BarcodeInputFields extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+            Text(
+              'Enter Barcode Data',
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
               ),
-              child:
-                  Icon(Icons.edit_outlined, color: theme.colorScheme.secondary),
-            ),
-            const SizedBox(width: 12),
-            Text('Configure Barcode Data',
-                style: theme.textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold))
+            )
           ]),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           ...inputFields.map((field) {
             final controller = controllers[field.key];
             if (controller == null) return const SizedBox.shrink();
@@ -132,7 +127,7 @@ class BarcodeInputFields extends StatelessWidget {
               );
             } else {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: 0),
                 child: TextFormField(
                   controller: controller,
                   decoration: InputDecoration(
