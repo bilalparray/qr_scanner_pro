@@ -1,9 +1,11 @@
+// lib/screens/scan_screen.dart
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart'
-    as mlkit;
-import 'scan_result_screen.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_scanner/models/scan_result.dart';
+import 'package:qr_scanner/screens/scan_result_screen.dart';
+import '../services/qr_parser.dart';
+import '../widgets/scan_overlay.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -12,278 +14,226 @@ class ScanScreen extends StatefulWidget {
   State<ScanScreen> createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen> {
-  final MobileScannerController _controller = MobileScannerController();
-  late final mlkit.BarcodeScanner _mlKitScanner;
-  bool _isFlashOn = false;
-  bool _isScanning = true;
+class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
+  final MobileScannerController _ctrl = MobileScannerController();
+  final ImagePicker _picker = ImagePicker();
+  bool _isBusy = false;
+  bool _analyzingImage = false;
 
   @override
   void initState() {
     super.initState();
-    _mlKitScanner = mlkit.BarcodeScanner();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    _mlKitScanner.close();
-    _controller.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _ctrl.dispose();
     super.dispose();
   }
 
-  Future<void> _scanFromGallery() async {
-    if (_isFlashOn) {
-      setState(() {
-        _isFlashOn = false;
-      });
-      _controller.toggleTorch();
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _ctrl.start();
+    } else if (state == AppLifecycleState.paused) {
+      _ctrl.stop();
     }
-    setState(() {
-      _isScanning = true;
-    });
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return;
+  }
+
+  // ── live camera detection ─────────────────────────────────────────────────
+
+  void _onDetect(BarcodeCapture cap) async {
+    if (_isBusy || cap.barcodes.isEmpty) return;
+    setState(() => _isBusy = true);
+
+    final raw = cap.barcodes.first.rawValue ?? '';
+    final parsed = QRParser.parse(raw);
+    await _openResult(parsed);
+
+    setState(() => _isBusy = false);
+  }
+
+  // ── gallery import ────────────────────────────────────────────────────────
+
+  Future<void> _pickFromGallery() async {
+    if (_analyzingImage) return;
+    setState(() => _analyzingImage = true);
 
     try {
-      final inputImage = mlkit.InputImage.fromFilePath(pickedFile.path);
-      final mlkitBarcodes = await _mlKitScanner.processImage(inputImage);
-
-      if (mlkitBarcodes.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No barcode found in image')),
-          );
-        }
+      final XFile? file = await _picker.pickImage(
+          source: ImageSource.gallery, imageQuality: 100);
+      if (file == null) {
+        setState(() => _analyzingImage = false);
         return;
       }
 
-      final mlkitBarcode = mlkitBarcodes.first;
-      final rawValue = mlkitBarcode.rawValue ?? '';
-      final format = _convertMlKitFormat(mlkitBarcode.format);
+      _showLoadingDialog();
+      final capture = await _ctrl.analyzeImage(file.path);
+      Navigator.of(context).pop(); // close loading
 
-      _handleScannedCode(rawValue, format, mlkitBarcode);
+      if (capture != null && capture.barcodes.isNotEmpty) {
+        final raw = capture.barcodes.first.rawValue ?? '';
+        await _openResult(QRParser.parse(raw));
+      } else {
+        _showErrorDialog('No QR code found in that image.');
+      }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error scanning image: $e')),
-        );
-      }
+      if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      _showErrorDialog('Image analysis failed: $e');
     } finally {
-      if (mounted) setState(() => _isScanning = true);
+      setState(() => _analyzingImage = false);
     }
   }
 
-  BarcodeFormat _convertMlKitFormat(mlkit.BarcodeFormat format) {
-    switch (format) {
-      case mlkit.BarcodeFormat.qrCode:
-        return BarcodeFormat.qrCode;
-      case mlkit.BarcodeFormat.aztec:
-        return BarcodeFormat.aztec;
-      case mlkit.BarcodeFormat.code39:
-        return BarcodeFormat.code39;
-      case mlkit.BarcodeFormat.code93:
-        return BarcodeFormat.code93;
-      case mlkit.BarcodeFormat.code128:
-        return BarcodeFormat.code128;
-      case mlkit.BarcodeFormat.dataMatrix:
-        return BarcodeFormat.dataMatrix;
-      case mlkit.BarcodeFormat.ean13:
-        return BarcodeFormat.ean13;
-      case mlkit.BarcodeFormat.ean8:
-        return BarcodeFormat.ean8;
-      case mlkit.BarcodeFormat.itf:
-        return BarcodeFormat.itf;
-      case mlkit.BarcodeFormat.pdf417:
-        return BarcodeFormat.pdf417;
-      case mlkit.BarcodeFormat.upca:
-        return BarcodeFormat.upcA;
-      case mlkit.BarcodeFormat.upce:
-        return BarcodeFormat.upcE;
-      default:
-        return BarcodeFormat.unknown;
-    }
-  }
+  // ── ui helpers ────────────────────────────────────────────────────────────
 
-  Future<void> _handleScannedCode(
-      String code, BarcodeFormat format, dynamic scannedResult) async {
-    if (!_isScanning) return;
-    setState(() {
-      _isScanning = false;
-      if (_isFlashOn) {
-        _isFlashOn = false;
-        _controller.toggleTorch();
-      }
-    });
-
-    if (!mounted) return;
-
-    Navigator.push(
+  Future<void> _openResult(ScanResultModel r) async {
+    await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ScanResultScreen(
-          content: code,
-          format: format.toString().split('.').last,
-          type: getQrType(scannedResult),
-          timestamp: DateTime.now(),
-        ),
-      ),
-    ).then((_) => setState(() => _isScanning = true));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Scan Code'),
-        actions: [
-          IconButton(
-            icon: Icon(_isFlashOn ? Icons.flash_on : Icons.flash_off),
-            onPressed: () {
-              setState(() {
-                _isFlashOn = !_isFlashOn;
-                _controller.toggleTorch();
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.image),
-            onPressed: _scanFromGallery,
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: (capture) {
-              final barcodes = capture.barcodes;
-              if (barcodes.isNotEmpty) {
-                _handleScannedCode(
-                  barcodes.first.rawValue ?? '',
-                  barcodes.first.format,
-                  barcodes.first,
-                );
-              }
-            },
-          ),
-          _buildScanOverlay(),
-        ],
-      ),
+      MaterialPageRoute(builder: (_) => ResultScreen(result: r)),
     );
   }
 
-  Widget _buildScanOverlay() {
-    return Center(
-      child: Container(
-        width: 250,
-        height: 250,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.red, width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 250,
-              color: const Color.fromARGB(137, 120, 119, 119),
-              padding: const EdgeInsets.all(8),
-              child: const Text(
-                'Align code within frame to scan',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Analyzing image…'),
           ],
         ),
       ),
     );
   }
 
-  String getQrType(dynamic barcode) {
-    final data = barcode.rawValue ?? '';
+  void _showErrorDialog(String msg) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(msg),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
-    // 1) First look at the semantic type:
-    switch (barcode.type) {
-      case BarcodeType.url:
-        return 'URL';
-      case BarcodeType.contactInfo:
-        return 'Contact';
-      case BarcodeType.email:
-        return 'Email';
-      case BarcodeType.phone:
-        return 'Phone';
-      case BarcodeType.sms:
-        return 'SMS';
-      case BarcodeType.wifi:
-        return 'WiFi';
-      case BarcodeType.geo:
-        return 'Location';
-      case BarcodeType.calendarEvent:
-        return 'Calendar Event';
-      case BarcodeType.isbn:
-        return 'ISBN';
-      case BarcodeType.driverLicense:
-        return 'Driver Licence';
-      // add other ML Kit `valueType`s if supported...
-      default:
-        break;
-    }
+  // ── build ─────────────────────────────────────────────────────────────────
 
-    // 2) Fallback to checking prefixes (your original logic):
-    if (data.startsWith('http')) return 'URL';
-    if (data.startsWith('mailto:')) return 'Email';
-    if (data.startsWith('MATMSG:')) return 'Email';
-    if (data.startsWith('SMTP:')) return 'Email';
-    if (data.startsWith('BEGIN:VCARD') || data.startsWith('MECARD:')) {
-      return 'Contact';
-    }
-    if (data.startsWith('bitcoin:')) return 'Bitcoin';
-    if (data.startsWith('ethereum:')) return 'Ethereum';
-    if (data.startsWith('SMSTO:') || data.startsWith('sms:')) return 'SMS';
-    if (data.startsWith('WIFI:')) return 'WiFi';
-    if (data.startsWith('geo:')) return 'Location';
-    if (data.startsWith('tel:')) return 'Phone';
-    if (data.startsWith('BEGIN:VEVENT') || data.startsWith('BEGIN:VCALENDAR')) {
-      return 'Calendar Event';
-    }
-    if (data.startsWith('upi:') || // make sure to include the colon
-        data.startsWith('upi')) {
-      return 'UPI Payment';
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scan QR Code'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.photo_library),
+            tooltip: 'Pick from Gallery',
+            onPressed: _analyzingImage ? null : _pickFromGallery,
+          ),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          MobileScanner(controller: _ctrl, onDetect: _onDetect),
+          const ScanOverlay(),
+          if (_isBusy)
+            Container(
+              color: Colors.black45,
+              child: const Center(child: CircularProgressIndicator()),
+            ),
 
-    // 3) Finally, fall back to the raw symbology format:
-    switch (barcode.type) {
-      case "product":
-        return 'Product';
-      case BarcodeFormat.code128:
-        return 'Code 128';
-      case BarcodeFormat.code39:
-        return 'Code 39';
-      case BarcodeFormat.code93:
-        return 'Code 93';
-      case BarcodeFormat.codabar:
-        return 'Codabar';
-      case BarcodeFormat.dataMatrix:
-        return 'Data Matrix';
-      case BarcodeFormat.ean13:
-        return 'EAN-13';
-      case BarcodeFormat.ean8:
-        return 'EAN-8';
-      case BarcodeFormat.itf:
-        return 'ITF';
-      case BarcodeFormat.pdf417:
-        return 'PDF417';
-      case BarcodeFormat.qrCode:
-        return 'QR Code';
-      case BarcodeFormat.upcA:
-        return 'UPC-A';
-      case BarcodeFormat.upcE:
-        return 'UPC-E';
+          // ── bottom controls ───────────────────────────────────────────────
+          Positioned(
+            bottom: 24,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // flash
+                _CircleButton(
+                  onPressed: _ctrl.toggleTorch,
+                  child: ValueListenableBuilder<MobileScannerState>(
+                    valueListenable: _ctrl,
+                    builder: (_, state, __) => Icon(
+                      switch (state.torchState) {
+                        TorchState.on => Icons.flash_on,
+                        TorchState.auto => Icons.flash_auto,
+                        _ => Icons.flash_off,
+                      },
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                ),
+                // gallery
+                _CircleButton(
+                  onPressed: _analyzingImage ? null : _pickFromGallery,
+                  child: _analyzingImage
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.photo_library,
+                          color: Colors.white, size: 32),
+                ),
+                // camera switch
+                _CircleButton(
+                  onPressed: _ctrl.switchCamera,
+                  child: ValueListenableBuilder<MobileScannerState>(
+                    valueListenable: _ctrl,
+                    builder: (_, state, __) => Icon(
+                      state.cameraDirection == CameraFacing.front
+                          ? Icons.camera_front
+                          : Icons.camera_rear,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-      default:
-        return 'Text';
-    }
+class _CircleButton extends StatelessWidget {
+  const _CircleButton({
+    required this.child,
+    required this.onPressed,
+  });
+
+  final Widget child;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.black54,
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(onPressed: onPressed, icon: child),
+    );
   }
 }
