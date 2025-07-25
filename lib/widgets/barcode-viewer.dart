@@ -21,67 +21,62 @@ class BarcodePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                      color: Colors.green.shade100,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Icon(Icons.check_circle, color: Colors.green.shade600),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Generated Barcode',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade700),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            RepaintBoundary(
-              key: barcodeKey,
-              child: Container(
-                padding: const EdgeInsets.all(20),
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade300, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4))
-                  ],
-                ),
-                child: Center(child: child),
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(8)),
+                child: Icon(Icons.check_circle, color: Colors.green.shade600),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Generated Barcode',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          RepaintBoundary(
+            key: barcodeKey,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4))
+                ],
+              ),
+              child: Center(child: child),
             ),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                _buildActionButton(Icons.share, 'Share', Colors.blue, onShare),
-                _buildActionButton(
-                    Icons.download, 'Save', Colors.green, onSave),
-                _buildActionButton(
-                    Icons.fullscreen, 'View', Colors.purple, onViewFullScreen),
-              ],
-            )
-          ],
-        ),
+          ),
+          const SizedBox(height: 24),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildActionButton(Icons.share, 'Share', Colors.blue, onShare),
+              _buildActionButton(Icons.download, 'Save', Colors.green, onSave),
+              _buildActionButton(
+                  Icons.fullscreen, 'View', Colors.purple, onViewFullScreen),
+            ],
+          )
+        ],
       ),
     );
   }

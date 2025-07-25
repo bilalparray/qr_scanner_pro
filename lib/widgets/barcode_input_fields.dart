@@ -61,126 +61,121 @@ class BarcodeInputFields extends StatelessWidget {
       );
     }
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.secondary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.edit_outlined,
-                    color: theme.colorScheme.secondary),
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.secondary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(width: 12),
-              Text('Configure Barcode Data',
-                  style: theme.textTheme.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold))
-            ]),
-            const SizedBox(height: 20),
-            ...inputFields.map((field) {
-              final controller = controllers[field.key];
-              if (controller == null) return const SizedBox.shrink();
+              child:
+                  Icon(Icons.edit_outlined, color: theme.colorScheme.secondary),
+            ),
+            const SizedBox(width: 12),
+            Text('Configure Barcode Data',
+                style: theme.textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold))
+          ]),
+          const SizedBox(height: 20),
+          ...inputFields.map((field) {
+            final controller = controllers[field.key];
+            if (controller == null) return const SizedBox.shrink();
 
-              if (field.dropdownOptions != null) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: field.label,
-                      hintText: field.hint,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      filled: true,
-                      fillColor: theme.colorScheme.surface,
-                      prefixIcon: Icon(_iconForField(field.key)),
-                    ),
-                    items: field.dropdownOptions!
-                        .map((opt) =>
-                            DropdownMenuItem(value: opt, child: Text(opt)))
-                        .toList(),
-                    value: controller.text.isEmpty ? null : controller.text,
-                    onChanged: (val) {
-                      controller.text = val ?? '';
-                      onChange();
-                    },
-                    validator: (val) {
-                      if (field.isRequired && (val == null || val.isEmpty)) {
-                        return '${field.label} is required';
-                      }
-                      if (field.pattern != null &&
-                          val != null &&
-                          val.isNotEmpty) {
-                        final regex =
-                            RegExp(field.pattern!, caseSensitive: false);
-                        if (!regex.hasMatch(val)) {
-                          return 'Invalid ${field.label} format';
-                        }
-                      }
-                      if (field.maxLength != null &&
-                          val != null &&
-                          val.length != field.maxLength) {
-                        return '${field.label} must be exactly ${field.maxLength} characters';
-                      }
-                      return null;
-                    },
+            if (field.dropdownOptions != null) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: field.label,
+                    hintText: field.hint,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: theme.colorScheme.surface,
+                    prefixIcon: Icon(_iconForField(field.key)),
                   ),
-                );
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TextFormField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      labelText: field.label,
-                      hintText: field.hint,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      filled: true,
-                      fillColor: theme.colorScheme.surface,
-                      prefixIcon: Icon(_iconForField(field.key)),
-                      suffixIcon: field.isRequired
-                          ? Icon(Icons.star,
-                              size: 12, color: Colors.red.shade400)
-                          : null,
-                    ),
-                    keyboardType: field.keyboardType,
-                    maxLength: field.maxLength,
-                    validator: (val) {
-                      if (field.isRequired &&
-                          (val == null || val.trim().isEmpty)) {
-                        return '${field.label} is required';
+                  items: field.dropdownOptions!
+                      .map((opt) =>
+                          DropdownMenuItem(value: opt, child: Text(opt)))
+                      .toList(),
+                  value: controller.text.isEmpty ? null : controller.text,
+                  onChanged: (val) {
+                    controller.text = val ?? '';
+                    onChange();
+                  },
+                  validator: (val) {
+                    if (field.isRequired && (val == null || val.isEmpty)) {
+                      return '${field.label} is required';
+                    }
+                    if (field.pattern != null &&
+                        val != null &&
+                        val.isNotEmpty) {
+                      final regex =
+                          RegExp(field.pattern!, caseSensitive: false);
+                      if (!regex.hasMatch(val)) {
+                        return 'Invalid ${field.label} format';
                       }
-                      if (field.pattern != null &&
-                          val != null &&
-                          val.isNotEmpty) {
-                        final regex =
-                            RegExp(field.pattern!, caseSensitive: false);
-                        if (!regex.hasMatch(val)) {
-                          return 'Invalid ${field.label} format';
-                        }
-                      }
-                      if (field.maxLength != null &&
-                          val != null &&
-                          val.length != field.maxLength) {
-                        return '${field.label} must be exactly ${field.maxLength} characters';
-                      }
-                      return null;
-                    },
-                    onChanged: (_) => onChange(),
+                    }
+                    if (field.maxLength != null &&
+                        val != null &&
+                        val.length != field.maxLength) {
+                      return '${field.label} must be exactly ${field.maxLength} characters';
+                    }
+                    return null;
+                  },
+                ),
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: TextFormField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    labelText: field.label,
+                    hintText: field.hint,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: theme.colorScheme.surface,
+                    prefixIcon: Icon(_iconForField(field.key)),
+                    suffixIcon: field.isRequired
+                        ? Icon(Icons.star, size: 12, color: Colors.red.shade400)
+                        : null,
                   ),
-                );
-              }
-            }),
-          ],
-        ),
+                  keyboardType: field.keyboardType,
+                  maxLength: field.maxLength,
+                  validator: (val) {
+                    if (field.isRequired &&
+                        (val == null || val.trim().isEmpty)) {
+                      return '${field.label} is required';
+                    }
+                    if (field.pattern != null &&
+                        val != null &&
+                        val.isNotEmpty) {
+                      final regex =
+                          RegExp(field.pattern!, caseSensitive: false);
+                      if (!regex.hasMatch(val)) {
+                        return 'Invalid ${field.label} format';
+                      }
+                    }
+                    if (field.maxLength != null &&
+                        val != null &&
+                        val.length != field.maxLength) {
+                      return '${field.label} must be exactly ${field.maxLength} characters';
+                    }
+                    return null;
+                  },
+                  onChanged: (_) => onChange(),
+                ),
+              );
+            }
+          }),
+        ],
       ),
     );
   }

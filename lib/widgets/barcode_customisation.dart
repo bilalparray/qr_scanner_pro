@@ -63,121 +63,117 @@ class BarcodeCustomization extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.tertiary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.palette_outlined,
-                    color: theme.colorScheme.tertiary),
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.tertiary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(width: 12),
-              Text('Customization',
-                  style: theme.textTheme.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold))
-            ]),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () async => await _pickColor(
-                        context, foregroundColor, onForegroundColorChanged),
-                    borderRadius: BorderRadius.circular(12),
-                    child:
-                        _colorPickerBox(context, 'Foreground', foregroundColor),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: InkWell(
-                    onTap: () async => await _pickColor(
-                        context, backgroundColor, onBackgroundColorChanged),
-                    borderRadius: BorderRadius.circular(12),
-                    child:
-                        _colorPickerBox(context, 'Background', backgroundColor),
-                  ),
-                ),
-              ],
+              child: Icon(Icons.palette_outlined,
+                  color: theme.colorScheme.tertiary),
             ),
-            const SizedBox(height: 20),
-            Text('Size Controls',
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(Icons.width_normal, color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Text('Width: ${width.round()}px'),
-                Expanded(
-                  child: Slider(
-                    value: width,
-                    min: 200,
-                    max: 400,
-                    divisions: 20,
-                    onChanged: onWidthChanged,
-                  ),
-                )
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.height, color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Text('Height: ${height.round()}px'),
-                Expanded(
-                  child: Slider(
-                    value: height,
-                    min: 100,
-                    max: 250,
-                    divisions: 15,
-                    onChanged: onHeightChanged,
-                  ),
-                )
-              ],
-            ),
-            if (isShowValueEnabled) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+            const SizedBox(width: 12),
+            Text('Customization',
+                style: theme.textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold))
+          ]),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () async => await _pickColor(
+                      context, foregroundColor, onForegroundColorChanged),
                   borderRadius: BorderRadius.circular(12),
+                  child:
+                      _colorPickerBox(context, 'Foreground', foregroundColor),
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.text_fields, color: theme.colorScheme.primary),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Show Text Value',
-                              style: theme.textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w600)),
-                          Text('Display text below the barcode',
-                              style: theme.textTheme.bodySmall),
-                        ],
-                      ),
-                    ),
-                    Switch(value: showValue, onChanged: onShowValueChanged),
-                  ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: InkWell(
+                  onTap: () async => await _pickColor(
+                      context, backgroundColor, onBackgroundColorChanged),
+                  borderRadius: BorderRadius.circular(12),
+                  child:
+                      _colorPickerBox(context, 'Background', backgroundColor),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text('Size Controls',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(Icons.width_normal, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Text('Width: ${width.round()}px'),
+              Expanded(
+                child: Slider(
+                  value: width,
+                  min: 200,
+                  max: 400,
+                  divisions: 20,
+                  onChanged: onWidthChanged,
                 ),
               )
             ],
+          ),
+          Row(
+            children: [
+              Icon(Icons.height, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Text('Height: ${height.round()}px'),
+              Expanded(
+                child: Slider(
+                  value: height,
+                  min: 100,
+                  max: 250,
+                  divisions: 15,
+                  onChanged: onHeightChanged,
+                ),
+              )
+            ],
+          ),
+          if (isShowValueEnabled) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.text_fields, color: theme.colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Show Text Value',
+                            style: theme.textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w600)),
+                        Text('Display text below the barcode',
+                            style: theme.textTheme.bodySmall),
+                      ],
+                    ),
+                  ),
+                  Switch(value: showValue, onChanged: onShowValueChanged),
+                ],
+              ),
+            )
           ],
-        ),
+        ],
       ),
     );
   }
