@@ -1,3 +1,5 @@
+// barcode_customization.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
@@ -29,37 +31,37 @@ class BarcodeCustomization extends StatelessWidget {
     required this.isShowValueEnabled,
   });
 
+  Future<void> _pickColor(BuildContext context, Color current,
+      ValueChanged<Color> onChanged) async {
+    Color tempColor = current;
+    Color? picked = await showDialog<Color>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Select Color'),
+        content: SingleChildScrollView(
+          child: BlockPicker(
+            pickerColor: tempColor,
+            onColorChanged: (color) => tempColor = color,
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(null),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(tempColor),
+              child: const Text('OK')),
+        ],
+      ),
+    );
+    if (picked != null) {
+      onChanged(picked);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    Future<void> _pickColor(BuildContext context, Color current,
-        ValueChanged<Color> onChanged) async {
-      // For brevity, use built-in color picker or any you want
-      Color? picked = await showDialog<Color>(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Select Color'),
-          content: SingleChildScrollView(
-            child: BlockPicker(
-              pickerColor: current,
-              onColorChanged: onChanged,
-            ),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.of(context).pop(null),
-                child: const Text('Cancel')),
-            TextButton(
-                onPressed: () => Navigator.of(context).pop(current),
-                child: const Text('OK')),
-          ],
-        ),
-      );
-      if (picked != null) {
-        onChanged(picked);
-      }
-    }
 
     return Card(
       elevation: 4,

@@ -17,7 +17,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:cross_file/cross_file.dart';
 
 class BarcodeHomePage extends StatefulWidget {
   const BarcodeHomePage({super.key});
@@ -127,9 +126,16 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
             data: data,
             version: QrVersions.auto,
             size: _barcodeWidth,
-            foregroundColor: _foregroundColor,
             backgroundColor: _backgroundColor,
             errorCorrectionLevel: QrErrorCorrectLevel.M,
+            eyeStyle: QrEyeStyle(
+              eyeShape: QrEyeShape.square,
+              color: _foregroundColor,
+            ),
+            dataModuleStyle: QrDataModuleStyle(
+              dataModuleShape: QrDataModuleShape.square,
+              color: _foregroundColor,
+            ),
           );
 
         case BarcodeCodeType.code128:
@@ -374,10 +380,22 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 width: _barcodeWidth,
                 height: _barcodeHeight,
                 showValue: _showValue,
-                onForegroundColorChanged: (color) =>
-                    setState(() => _foregroundColor = color),
-                onBackgroundColorChanged: (color) =>
-                    setState(() => _backgroundColor = color),
+                onForegroundColorChanged: (color) {
+                  setState(() {
+                    _foregroundColor = color;
+                    if (_generatedBarcode != null) {
+                      _generatedBarcode = _buildBarcodeWidget();
+                    }
+                  });
+                },
+                onBackgroundColorChanged: (color) {
+                  setState(() {
+                    _backgroundColor = color;
+                    if (_generatedBarcode != null) {
+                      _generatedBarcode = _buildBarcodeWidget();
+                    }
+                  });
+                },
                 onWidthChanged: (width) {
                   setState(() {
                     _barcodeWidth = width;
