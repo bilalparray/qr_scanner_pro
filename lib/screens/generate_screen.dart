@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/screens/settings_screen.dart';
 import 'package:qr_scanner/utils/barcode_utils.dart';
@@ -266,7 +267,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
 
     await shareContent(
       text:
-          'Generated Barcode ${_selectedType.displayName}\n\nDownload our App at https://play.google.com/store/apps/details?id=your.app.id',
+          'Generated Barcode ${_selectedType.displayName}\n\nDownload our App at ${Environment.playstoreUrl}',
       files: [XFile(file.path)],
     );
 
@@ -335,7 +336,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
           children: [
             Icon(_selectedType.category.icon),
             const SizedBox(width: 8),
-            const Text('Barcode & QR Generator'),
+            Text('Generate ' '${_selectedType.displayName}'),
           ],
         ),
         actions: [
@@ -350,7 +351,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
           autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _formKey,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(5),
             children: [
               BarcodeTypeSelector(
                 selectedType: _selectedType,
