@@ -323,6 +323,14 @@ class BarcodeInputField {
             hint: 'Enter text, URL, or any data',
           )
         ];
+      case BarcodeCodeType.qrCodePDF:
+        return const [
+          BarcodeInputField(
+            key: 'data',
+            label: 'PDF Link',
+            hint: 'Enter PDF Link',
+          )
+        ];
       case BarcodeCodeType.qrCodeWiFi:
         return const [
           BarcodeInputField(
@@ -416,7 +424,7 @@ class BarcodeInputField {
               key: 'url',
               label: 'App URL or Deep Link',
               hint:
-                  'https://play.google.com/store/apps/details?id=com.example.app',
+                  'https://play.google.com/store/apps/details?id=com.qayham.qrscanner',
               keyboardType: TextInputType.url),
         ];
       case BarcodeCodeType.qrCodePhone:

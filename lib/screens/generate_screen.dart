@@ -122,6 +122,13 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
         case BarcodeCodeType.qrCodeWiFi:
         case BarcodeCodeType.qrCodeVCard:
         case BarcodeCodeType.microQR:
+        case BarcodeCodeType.qrCodeSms:
+        case BarcodeCodeType.qrCodeEmail:
+        case BarcodeCodeType.qrCodePDF:
+        case BarcodeCodeType.qrCodeMultiURl:
+        case BarcodeCodeType.qrCodeGeo:
+        case BarcodeCodeType.qrCodeAPP:
+        case BarcodeCodeType.qrCodePhone:
           return QrImageView(
             data: data,
             version: QrVersions.auto,
