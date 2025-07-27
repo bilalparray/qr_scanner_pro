@@ -71,6 +71,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
       _showLoadingDialog();
       final capture = await _ctrl.analyzeImage(file.path);
+      if (!mounted) return;
       Navigator.of(context).pop(); // close loading
 
       if (capture != null && capture.barcodes.isNotEmpty) {
@@ -80,6 +81,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
         _showErrorDialog('No QR code found in that image.');
       }
     } catch (e) {
+      if (!mounted) return;
       if (Navigator.of(context).canPop()) Navigator.of(context).pop();
       _showErrorDialog('Image analysis failed: $e');
     } finally {

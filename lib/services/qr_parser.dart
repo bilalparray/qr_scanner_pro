@@ -106,7 +106,7 @@ class QRParser {
       map[key] = value;
     }
 
-    DateTime? _parseDt(String? dt) {
+    DateTime? parseDt(String? dt) {
       if (dt == null) return null;
       try {
         return DateFormat("yyyyMMdd'T'HHmmss'Z'").parseUtc(dt);
@@ -119,13 +119,12 @@ class QRParser {
       'summary': map['SUMMARY'],
       'description': map['DESCRIPTION'],
       'location': map['LOCATION'],
-      'start': _parseDt(map['DTSTART']),
-      'end': _parseDt(map['DTEND']),
+      'start': parseDt(map['DTSTART']),
+      'end': parseDt(map['DTEND']),
     };
   }
 
   static Map<String, dynamic> _parseWifi(String input) {
-    // Example: WIFI:T:WPA;S:MySSID;P:MyPassword;;
     final map = <String, String>{};
     for (var part in input.replaceFirst('WIFI:', '').split(';')) {
       if (part.isEmpty) continue;

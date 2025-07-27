@@ -1,4 +1,3 @@
-// lib/services/action_handler.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,20 +10,28 @@ class ActionHandler {
   const ActionHandler._();
 
   static Future<void> copyToClipboard(BuildContext ctx, String data) async {
+    final messenger = ScaffoldMessenger.of(ctx);
     await Clipboard.setData(ClipboardData(text: data));
-    _snack(ctx, 'Copied to clipboard');
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Copied to clipboard')),
+    );
   }
 
   static Future<void> share(BuildContext ctx, String data) async {
-    await Share.share(data);
+    final shareParams = ShareParams(text: data);
+    await SharePlus.instance.share(shareParams);
   }
 
   static Future<void> saveToFile(BuildContext ctx, String data) async {
+    final messenger = ScaffoldMessenger.of(ctx);
     final dir = await getApplicationDocumentsDirectory();
-    final file =
-        File('${dir.path}/scan_${DateTime.now().millisecondsSinceEpoch}.txt');
+    final file = File(
+      '${dir.path}/scan_${DateTime.now().millisecondsSinceEpoch}.txt',
+    );
     await file.writeAsString(data);
-    _snack(ctx, 'Saved: ${file.path}');
+    messenger.showSnackBar(
+      SnackBar(content: Text('Saved: ${file.path}')),
+    );
   }
 
   static Future<void> handleTypeSpecific(
@@ -64,10 +71,14 @@ class ActionHandler {
   // --------------------------------------------------------------------------
 
   static Future<void> _openUri(BuildContext ctx, Uri uri) async {
+    final messenger = ScaffoldMessenger.of(ctx);
+
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      _snack(ctx, 'Cannot open URI');
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Cannot open URI')),
+      );
     }
   }
 

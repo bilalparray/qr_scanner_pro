@@ -43,6 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
       mode: LaunchMode.externalApplication,
     );
     if (!opened) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Could not open ${uri.toString()}')),
       );

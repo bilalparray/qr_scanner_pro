@@ -5,7 +5,7 @@ import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/screens/settings_screen.dart';
 import 'package:qr_scanner/utils/barcode_utils.dart';
-import 'package:qr_scanner/widgets/barcode-viewer.dart';
+import 'package:qr_scanner/widgets/barcode_viewer.dart';
 import 'package:qr_scanner/widgets/barcode_customisation.dart';
 import 'package:qr_scanner/widgets/barcode_input_fields.dart';
 import 'package:qr_scanner/widgets/code_type_selector.dart';
@@ -262,6 +262,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
 
     final imageBytes = await _captureBarcode();
     if (imageBytes == null) {
+      if (!mounted) return;
+
       GlobalErrorHandler.showErrorSnackBar(
           context, 'Failed to capture barcode image');
       return;
@@ -277,7 +279,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
           'Generated Barcode ${_selectedType.displayName}\n\nDownload our App at ${Environment.playstoreUrl}',
       files: [XFile(file.path)],
     );
-
+    if (!mounted) return;
     GlobalErrorHandler.showSuccessSnackBar(
         context, 'Barcode shared successfully!');
   }
@@ -287,6 +289,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
 
     final imageBytes = await _captureBarcode();
     if (imageBytes == null) {
+      if (!mounted) return;
       GlobalErrorHandler.showErrorSnackBar(
           context, 'Failed to capture barcode image');
       return;
@@ -304,7 +307,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
         'barcode_${_selectedType.name}_${DateTime.now().millisecondsSinceEpoch}.png';
     final file = File('${directory.path}/$fileName');
     await file.writeAsBytes(imageBytes);
-
+    if (!mounted) return;
     GlobalErrorHandler.showSuccessSnackBar(context, 'Saved: $fileName');
   }
 
