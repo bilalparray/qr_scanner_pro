@@ -11,8 +11,13 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-android/app/build/interme
-android
+android/app/build/
+ios
+windows
+linux
+web
+test
+macos
 
 # IntelliJ related
 *.iml
