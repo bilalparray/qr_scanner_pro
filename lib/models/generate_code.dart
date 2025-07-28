@@ -198,33 +198,33 @@ END:VCARD
     BarcodeCategory.twoDimensional,
     'Aztec Test',
   ),
-  maxiCode(
-    'MaxiCode',
-    'Fixed-size postal barcode',
-    BarcodeCategory.twoDimensional,
-    '12345',
-  ),
+  // maxiCode(
+  //   'MaxiCode',
+  //   'Fixed-size postal barcode',
+  //   BarcodeCategory.twoDimensional,
+  //   '12345',
+  // ),
 
   // Postal Barcodes
-  postnet('POSTNET', 'US Postal Service', BarcodeCategory.postal, '12345'),
-  planet(
-    'PLANET',
-    'US Postal tracking',
-    BarcodeCategory.postal,
-    '123456789012',
-  ),
-  australianPost(
-    'AU Post',
-    'Australian Post barcode',
-    BarcodeCategory.postal,
-    '1234567890',
-  ),
-  royalMail(
-    'Royal Mail',
-    'UK Royal Mail barcode',
-    BarcodeCategory.postal,
-    'SN34RD1A',
-  ),
+  // postnet('POSTNET', 'US Postal Service', BarcodeCategory.postal, '12345'),
+  // planet(
+  //   'PLANET',
+  //   'US Postal tracking',
+  //   BarcodeCategory.postal,
+  //   '123456789012',
+  // ),
+  // australianPost(
+  //   'AU Post',
+  //   'Australian Post barcode',
+  //   BarcodeCategory.postal,
+  //   '1234567890',
+  // ),
+  // royalMail(
+  //   'Royal Mail',
+  //   'UK Royal Mail barcode',
+  //   BarcodeCategory.postal,
+  //   'SN34RD1A',
+  // ),
 
   // Specialized
   gs1_128(
@@ -285,7 +285,7 @@ extension BarcodeCodeTypeExtensions on BarcodeCodeType {
         BarcodeCodeType.dataMatrix,
         BarcodeCodeType.pdf417,
         BarcodeCodeType.aztec,
-        BarcodeCodeType.maxiCode,
+        // BarcodeCodeType.maxiCode,
       ].contains(this);
 }
 
@@ -595,63 +595,63 @@ class BarcodeInputField {
           BarcodeInputField(
               key: 'data', label: 'Data', hint: 'Up to 3750 bytes'),
         ];
-      case BarcodeCodeType.maxiCode:
-        return const [
-          BarcodeInputField(
-              key: 'primaryMessage', label: 'Postal Code', hint: '12345'),
-          BarcodeInputField(key: 'country', label: 'Country Code', hint: 'US'),
-          BarcodeInputField(
-              key: 'serviceClass', label: 'Service Class', hint: '001'),
-        ];
+      // case BarcodeCodeType.maxiCode:
+      //   return const [
+      //     BarcodeInputField(
+      //         key: 'primaryMessage', label: 'Postal Code', hint: '12345'),
+      //     BarcodeInputField(key: 'country', label: 'Country Code', hint: 'US'),
+      //     BarcodeInputField(
+      //         key: 'serviceClass', label: 'Service Class', hint: '001'),
+      //   ];
 
       // Postal Barcodes
-      case BarcodeCodeType.postnet:
-        return const [
-          BarcodeInputField(
-            key: 'zipCode',
-            label: 'ZIP Code',
-            hint: '5 or 9 digit ZIP (e.g., 12345)',
-            keyboardType: TextInputType.number,
-            pattern: r'^\d{5}(\d{4})?$',
-          ),
-        ];
-      case BarcodeCodeType.planet:
-        return const [
-          BarcodeInputField(
-            key: 'trackingNumber',
-            label: 'Tracking Number',
-            hint: '12-digit tracking number',
-            keyboardType: TextInputType.number,
-            maxLength: 12,
-            pattern: r'^\d{12}$',
-          ),
-        ];
-      case BarcodeCodeType.australianPost:
-        return const [
-          BarcodeInputField(
-            key: 'sortingCode',
-            label: 'Sorting Code',
-            hint: '8-digit sorting code',
-            keyboardType: TextInputType.number,
-            maxLength: 8,
-            pattern: r'^\d{8}$',
-          ),
-          BarcodeInputField(
-            key: 'customerInfo',
-            label: 'Customer Info',
-            hint: 'Optional customer information',
-            isRequired: false,
-          ),
-        ];
-      case BarcodeCodeType.royalMail:
-        return const [
-          BarcodeInputField(
-            key: 'postCode',
-            label: 'Post Code',
-            hint: 'UK postcode (e.g., SW1A 1AA)',
-            pattern: r'^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][A-Z]{2}$',
-          ),
-        ];
+      // case BarcodeCodeType.postnet:
+      //   return const [
+      //     BarcodeInputField(
+      //       key: 'zipCode',
+      //       label: 'ZIP Code',
+      //       hint: '5 or 9 digit ZIP (e.g., 12345)',
+      //       keyboardType: TextInputType.number,
+      //       pattern: r'^\d{5}(\d{4})?$',
+      //     ),
+      //   ];
+      // case BarcodeCodeType.planet:
+      //   return const [
+      //     BarcodeInputField(
+      //       key: 'trackingNumber',
+      //       label: 'Tracking Number',
+      //       hint: '12-digit tracking number',
+      //       keyboardType: TextInputType.number,
+      //       maxLength: 12,
+      //       pattern: r'^\d{12}$',
+      //     ),
+      //   ];
+      // case BarcodeCodeType.australianPost:
+      //   return const [
+      //     BarcodeInputField(
+      //       key: 'sortingCode',
+      //       label: 'Sorting Code',
+      //       hint: '8-digit sorting code',
+      //       keyboardType: TextInputType.number,
+      //       maxLength: 8,
+      //       pattern: r'^\d{8}$',
+      //     ),
+      //     BarcodeInputField(
+      //       key: 'customerInfo',
+      //       label: 'Customer Info',
+      //       hint: 'Optional customer information',
+      //       isRequired: false,
+      //     ),
+      //   ];
+      // case BarcodeCodeType.royalMail:
+      //   return const [
+      //     BarcodeInputField(
+      //       key: 'postCode',
+      //       label: 'Post Code',
+      //       hint: 'UK postcode (e.g., SW1A 1AA)',
+      //       pattern: r'^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][A-Z]{2}$',
+      //     ),
+      //   ];
 
       // Specialized
       case BarcodeCodeType.gs1_128:
@@ -668,27 +668,27 @@ class BarcodeInputField {
             hint: 'Data corresponding to AI',
           ),
         ];
-      case BarcodeCodeType.pharmacode:
-        return const [
-          BarcodeInputField(
-            key: 'number',
-            label: 'Pharmacode Number',
-            hint: '3-131070',
-            keyboardType: TextInputType.number,
-            pattern: r'^([3-9]|[1-9][0-9]{1,4}|13[0-1][0-9]{3}|13107[0-9])$',
-          ),
-        ];
-      case BarcodeCodeType.pzn:
-        return const [
-          BarcodeInputField(
-            key: 'pznNumber',
-            label: 'PZN Number',
-            hint: '7-digit pharmaceutical number',
-            keyboardType: TextInputType.number,
-            maxLength: 7,
-            pattern: r'^\d{7}$',
-          ),
-        ];
+      // case BarcodeCodeType.pharmacode:
+      //   return const [
+      //     BarcodeInputField(
+      //       key: 'number',
+      //       label: 'Pharmacode Number',
+      //       hint: '3-131070',
+      //       keyboardType: TextInputType.number,
+      //       pattern: r'^([3-9]|[1-9][0-9]{1,4}|13[0-1][0-9]{3}|13107[0-9])$',
+      //     ),
+      //   ];
+      // case BarcodeCodeType.pzn:
+      //   return const [
+      //     BarcodeInputField(
+      //       key: 'pznNumber',
+      //       label: 'PZN Number',
+      //       hint: '7-digit pharmaceutical number',
+      //       keyboardType: TextInputType.number,
+      //       maxLength: 7,
+      //       pattern: r'^\d{7}$',
+      //     ),
+      //   ];
 
       default:
         return const [
