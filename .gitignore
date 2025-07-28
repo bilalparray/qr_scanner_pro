@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 android/app/build/interme
+android
 
 # IntelliJ related
 *.iml
