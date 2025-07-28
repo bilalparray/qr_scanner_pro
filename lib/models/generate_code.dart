@@ -143,9 +143,9 @@ END:VCARD
   ),
   ean8(
     'EAN-8',
-    '8-digit product code',
+    '7-digit product code',
     BarcodeCategory.oneDimensional,
-    '12345678',
+    '1234567',
   ),
   ean13(
     'EAN-13',
@@ -500,10 +500,10 @@ class BarcodeInputField {
           BarcodeInputField(
             key: 'data',
             label: 'EAN-8 Code',
-            hint: '8 digits (e.g., 12345678)',
+            hint: '8 digits (e.g., 1234567)',
             keyboardType: TextInputType.number,
-            maxLength: 8,
-            pattern: r'^\d{8}$',
+            maxLength: 7,
+            pattern: r'^\d{7}$',
           ),
         ];
       case BarcodeCodeType.ean13:
@@ -511,42 +511,45 @@ class BarcodeInputField {
           BarcodeInputField(
             key: 'data',
             label: 'EAN-13 Code',
-            hint: '13 digits (e.g., 1234567890123)',
+            hint: '13 digits (e.g., 123456789012)',
             keyboardType: TextInputType.number,
-            maxLength: 13,
-            pattern: r'^\d{13}$',
-          ),
-        ];
-      case BarcodeCodeType.upcA:
-        return const [
-          BarcodeInputField(
-            key: 'data',
-            label: 'UPC-A Code',
-            hint: '12 digits (e.g., 123456789012)',
-            keyboardType: TextInputType.number,
-            maxLength: 12,
+            maxLength: 12, // Only 12 digits, 13th calculated
             pattern: r'^\d{12}$',
           ),
         ];
+
+      case BarcodeCodeType.upcA:
+        return const [
+          // For generator fields:
+          BarcodeInputField(
+            key: 'data',
+            label: 'UPC-A Code',
+            hint: '11 digits (e.g., 03600029145)',
+            keyboardType: TextInputType.number,
+            maxLength: 11,
+            pattern: r'^\d{11}$',
+          ),
+        ];
+
       case BarcodeCodeType.upcE:
         return const [
           BarcodeInputField(
             key: 'data',
             label: 'UPC-E Code',
-            hint: '8 digits (e.g., 01234567)',
+            hint: '6 digits (e.g., 0123456)',
             keyboardType: TextInputType.number,
-            maxLength: 8,
-            pattern: r'^\d{8}$',
+            maxLength: 6,
+            pattern: r'^\d{6}$',
           ),
         ];
+
       case BarcodeCodeType.codabar:
         return const [
           BarcodeInputField(
-            key: 'data',
-            label: 'Codabar Data',
-            hint: 'Start with A-D, end with A-D (e.g., A123456B)',
-            pattern: r'^[A-Da-d][0-9\-\$\:\/\.\+]*[A-Da-d]$',
-          ),
+              key: 'data',
+              label: 'Codabar Data',
+              hint: 'e.g., 123456',
+              pattern: r'^[0-9\-\$\:\/\.\+]+$'),
         ];
       case BarcodeCodeType.itf:
         return const [
