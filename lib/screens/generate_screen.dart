@@ -15,11 +15,11 @@ import 'package:qr_scanner/widgets/download.dart';
 import 'package:qr_scanner/widgets/global_error.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'dart:io';
 
 class BarcodeHomePage extends StatefulWidget {
   const BarcodeHomePage({super.key});
@@ -35,6 +35,12 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   final Map<String, TextEditingController> _controllers = {};
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
+  // ⚠ Add ScrollController
+  final ScrollController _scrollController = ScrollController();
+
+  // ⚠ Preview section key
+  final GlobalKey _previewSectionKey = GlobalKey();
 
   BarcodeCodeType _selectedType = BarcodeCodeType.qrCode;
   Widget? _generatedBarcode;
@@ -62,6 +68,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   void dispose() {
     _animationController.dispose();
+    _scrollController.dispose(); // Dispose ScrollController
     for (final controller in _controllers.values) {
       controller.dispose();
     }
@@ -89,14 +96,32 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
     setState(() => _isGenerating = true);
 
     try {
-      await Future.delayed(
-          const Duration(milliseconds: 300)); // For UI feedback
+      await Future.delayed(const Duration(milliseconds: 300)); // UI feedback
       final widget = _buildBarcodeWidget();
       if (widget != null) {
         setState(() {
           _generatedBarcode = widget;
         });
         _animationController.forward(from: 0);
+
+        // ⚠ Scroll to preview after build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final context = _previewSectionKey.currentContext;
+          if (context != null) {
+            Scrollable.ensureVisible(
+              context,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          } else {
+            // Fallback: scroll to bottom
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          }
+        });
       } else {
         if (mounted) {
           GlobalErrorHandler.showErrorSnackBar(
@@ -262,7 +287,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
       final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -298,9 +323,11 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
     if (_generatedBarcode == null) return;
 
     final Uint8List? imageBytes = await _captureBarcode();
-    final fileName = 'barcode_${DateTime.now().millisecondsSinceEpoch}.png';
+    if (imageBytes == null) return;
 
-    downloadFileToDownloads(context, fileName: fileName, bytes: imageBytes!);
+    final fileName = 'barcode_${DateTime.now().millisecondsSinceEpoch}.png';
+    await downloadFileToDownloads(context,
+        fileName: fileName, bytes: imageBytes);
   }
 
   void _viewBarcodeFullScreen() {
@@ -330,7 +357,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   Widget build(BuildContext context) {
     final inputFields = BarcodeInputField.configForType(_selectedType);
-    // final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -338,7 +364,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
           children: [
             Icon(_selectedType.category.icon),
             const SizedBox(width: 8),
-            Text('Generate ' '${_selectedType.displayName}'),
+            Text('Generate ${_selectedType.displayName}'),
           ],
         ),
         actions: [
@@ -353,13 +379,13 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
           autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _formKey,
           child: ListView(
+            controller: _scrollController, // attach the scroll controller
             padding: const EdgeInsets.all(5),
             children: [
               BarcodeTypeSelector(
                 selectedType: _selectedType,
                 onTypeChanged: _onBarcodeTypeChanged,
               ),
-
               BarcodeInputFields(
                 inputFields: inputFields,
                 controllers: _controllers,
@@ -413,7 +439,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 },
                 isShowValueEnabled: !_selectedType.isQR && !_selectedType.is2D,
               ),
-              // const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _isGenerating ? null : _generateBarcode,
                 icon: _isGenerating
@@ -445,13 +470,16 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
               if (_generatedBarcode != null)
                 FadeTransition(
                   opacity: _fadeAnimation,
-                  child: BarcodePreview(
-                    barcodeKey: _barcodeKey,
-                    backgroundColor: _backgroundColor,
-                    onShare: _shareBarcode,
-                    onSave: _downloadBarcode,
-                    onViewFullScreen: _viewBarcodeFullScreen,
-                    child: _generatedBarcode!,
+                  child: KeyedSubtree(
+                    key: _previewSectionKey,
+                    child: BarcodePreview(
+                      barcodeKey: _barcodeKey,
+                      backgroundColor: _backgroundColor,
+                      onShare: _shareBarcode,
+                      onSave: _downloadBarcode,
+                      onViewFullScreen: _viewBarcodeFullScreen,
+                      child: _generatedBarcode!,
+                    ),
                   ),
                 ),
             ],
