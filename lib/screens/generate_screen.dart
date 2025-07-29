@@ -423,11 +423,18 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Icon(Icons.qr_code_2, size: 28),
-                label: Text(_isGenerating
-                    ? 'Generating...'
-                    : 'Generate ${_selectedType.displayName}'),
+                    : const Icon(Icons.qr_code_2,
+                        size: 28, color: Colors.white),
+                label: Text(
+                  _isGenerating
+                      ? 'Generating...'
+                      : 'Generate ${_selectedType.displayName}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
