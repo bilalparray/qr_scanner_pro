@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_scanner/screens/history.dart';
 import 'package:qr_scanner/screens/settings_screen.dart';
 import 'generate_screen.dart';
 import 'scan_screen.dart';
@@ -15,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const ScanScreen(),
     const BarcodeHomePage(),
+    const HistoryPage(),
     const SettingsPage(),
   ];
 
@@ -42,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.qr_code),
             label: 'Generate',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.history),
+            label: 'History',
           ),
           NavigationDestination(
             icon: Icon(Icons.settings),

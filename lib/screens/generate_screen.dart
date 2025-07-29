@@ -1,14 +1,17 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/generate_code.dart';
+import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:qr_scanner/screens/settings_screen.dart';
 import 'package:qr_scanner/utils/barcode_utils.dart';
 import 'package:qr_scanner/widgets/barcode_viewer.dart';
 import 'package:qr_scanner/widgets/barcode_customisation.dart';
 import 'package:qr_scanner/widgets/barcode_input_fields.dart';
 import 'package:qr_scanner/widgets/code_type_selector.dart';
+import 'package:qr_scanner/widgets/download.dart';
 import 'package:qr_scanner/widgets/global_error.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'dart:async';
@@ -115,7 +118,14 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   Widget? _buildBarcodeWidget() {
     final data = _buildDataString();
     if (data.isEmpty) return null;
+    const snippet = "";
 
+    Provider.of<HistoryProvider>(context, listen: false).addToHistory(
+      data,
+      snippet: snippet,
+      isGenerated: true,
+      codeType: _selectedType,
+    );
     try {
       switch (_selectedType) {
         case BarcodeCodeType.qrCode:
@@ -287,28 +297,10 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   Future<void> _downloadBarcode() async {
     if (_generatedBarcode == null) return;
 
-    final imageBytes = await _captureBarcode();
-    if (imageBytes == null) {
-      if (!mounted) return;
-      GlobalErrorHandler.showErrorSnackBar(
-          context, 'Failed to capture barcode image');
-      return;
-    }
+    final Uint8List? imageBytes = await _captureBarcode();
+    final fileName = 'barcode_${DateTime.now().millisecondsSinceEpoch}.png';
 
-    Directory? directory;
-    if (Platform.isAndroid) {
-      directory = Directory('/storage/emulated/0/Download');
-      if (!await directory.exists()) await directory.create(recursive: true);
-    } else {
-      directory = await getApplicationDocumentsDirectory();
-    }
-
-    final fileName =
-        'barcode_${_selectedType.name}_${DateTime.now().millisecondsSinceEpoch}.png';
-    final file = File('${directory.path}/$fileName');
-    await file.writeAsBytes(imageBytes);
-    if (!mounted) return;
-    GlobalErrorHandler.showSuccessSnackBar(context, 'Saved: $fileName');
+    downloadFileToDownloads(context, fileName: fileName, bytes: imageBytes!);
   }
 
   void _viewBarcodeFullScreen() {

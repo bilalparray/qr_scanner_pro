@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/models/scan_result.dart';
+import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:qr_scanner/screens/scan_result_screen.dart';
 import '../services/qr_parser.dart';
 import '../widgets/scan_overlay.dart';
@@ -44,13 +47,55 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
   // ── live camera detection ─────────────────────────────────────────────────
 
+// 1️⃣ First, add a helper to map the scanner’s format into your enum:
+  BarcodeCodeType _mapFormatToEnum(BarcodeFormat format) {
+    switch (format) {
+      case BarcodeFormat.qrCode:
+        return BarcodeCodeType.qrCode;
+      case BarcodeFormat.code128:
+        return BarcodeCodeType.code128;
+      case BarcodeFormat.code39:
+        return BarcodeCodeType.code39;
+      case BarcodeFormat.ean8:
+        return BarcodeCodeType.ean8;
+      case BarcodeFormat.ean13:
+        return BarcodeCodeType.ean13;
+      case BarcodeFormat.upcA:
+        return BarcodeCodeType.upcA;
+      case BarcodeFormat.upcE:
+        return BarcodeCodeType.upcE;
+      case BarcodeFormat.code93:
+        return BarcodeCodeType.code93;
+      case BarcodeFormat.dataMatrix:
+        return BarcodeCodeType.dataMatrix;
+      case BarcodeFormat.codabar:
+        return BarcodeCodeType.codabar;
+      // …add any others you support…
+      default:
+        return BarcodeCodeType.qrCode;
+    }
+  }
+
+// 2️⃣ Then update your _onDetect callback to actually pass that codeType:
   void _onDetect(BarcodeCapture cap) async {
     if (_isBusy || cap.barcodes.isEmpty) return;
     setState(() => _isBusy = true);
 
     final raw = cap.barcodes.first.rawValue ?? '';
+    final format = cap.barcodes.first.format;
+    final codeType = _mapFormatToEnum(format);
+
+    // If you have any parser logic, you can still use it:
     final parsed = QRParser.parse(raw);
     await _openResult(parsed);
+
+    // Now record to history — note snippet: raw (you could format differently if you want)
+    Provider.of<HistoryProvider>(context, listen: false).addToHistory(
+      raw,
+      snippet: raw,
+      codeType: codeType,
+      isGenerated: false,
+    );
 
     setState(() => _isBusy = false);
   }
@@ -76,7 +121,11 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
       if (capture != null && capture.barcodes.isNotEmpty) {
         final raw = capture.barcodes.first.rawValue ?? '';
+        final format = capture.barcodes.first.format;
+        final codeType = _mapFormatToEnum(format);
         await _openResult(QRParser.parse(raw));
+        Provider.of<HistoryProvider>(context, listen: false).addToHistory(raw,
+            isGenerated: false, snippet: '', codeType: codeType);
       } else {
         _showErrorDialog('No QR code found in that image.');
       }
