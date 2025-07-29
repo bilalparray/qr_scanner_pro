@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_scanner/models/generate_code.dart';
 
 class BarcodeInputFields extends StatelessWidget {
@@ -144,6 +145,15 @@ class BarcodeInputFields extends StatelessWidget {
                   ),
                   keyboardType: field.keyboardType,
                   maxLength: field.maxLength,
+                  inputFormatters: field.pattern != null
+                      ? [
+                          FilteringTextInputFormatter.allow(
+                            // Extract allowed characters from pattern for live filtering
+                            RegExp(_extractAllowedCharsForInputFormatter(
+                                field.pattern!)),
+                          ),
+                        ]
+                      : null,
                   validator: (val) {
                     if (field.isRequired &&
                         (val == null || val.trim().isEmpty)) {
@@ -173,5 +183,14 @@ class BarcodeInputFields extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _extractAllowedCharsForInputFormatter(String pattern) {
+    final match = RegExp(r'^\^\[([^\]]+)\]\*\$$').firstMatch(pattern);
+    if (match != null && match.groupCount == 1) {
+      return '[${match.group(1)!}]';
+    }
+    // Fallback: allow all chars (safe but no filtering)
+    return r'.*';
   }
 }
