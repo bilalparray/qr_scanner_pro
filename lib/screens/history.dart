@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:qr_scanner/utils/barcode_utils.dart';
-import 'package:qr_scanner/widgets/download.dart';
-import 'package:qr_scanner/widgets/global_error.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'dart:ui' as ui;
-import 'package:share_plus/share_plus.dart';
-import 'package:flutter/services.dart';
 
 import 'package:qr_scanner/models/history_model.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
@@ -140,18 +131,18 @@ class HistoryPage extends StatelessWidget {
     }
   }
 
-  Future<Uint8List?> _capturePreview(GlobalKey key) async {
-    try {
-      final boundary =
-          key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null) return null;
-      final image = await boundary.toImage(pixelRatio: 3);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    }
-  }
+  // Future<Uint8List?> _capturePreview(GlobalKey key) async {
+  //   try {
+  //     final boundary =
+  //         key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+  //     if (boundary == null) return null;
+  //     final image = await boundary.toImage(pixelRatio: 3);
+  //     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  //     return byteData?.buffer.asUint8List();
+  //   } catch (_) {
+  //     return null;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -229,53 +220,53 @@ class HistoryPage extends StatelessWidget {
                                 fontFamily: 'monospace', fontSize: 12)),
                       ],
                     ),
-                    actions: [
-                      TextButton.icon(
-                        icon: const Icon(Icons.download),
-                        label: const Text('Download'),
-                        onPressed: () async {
-                          final Uint8List? bytes =
-                              await _capturePreview(previewKey);
-                          if (bytes != null) {
-                            await downloadFileToDownloads(context,
-                                fileName:
-                                    'history_${item.timestamp.millisecondsSinceEpoch}.png',
-                                bytes: bytes);
-                          }
-                        },
-                      ),
-                      TextButton.icon(
-                        icon: const Icon(Icons.share),
-                        label: const Text('Share'),
-                        onPressed: () async {
-                          final bytes = await _capturePreview(previewKey);
-                          if (bytes != null) {
-                            final temp = await getTemporaryDirectory();
-                            final file = File(
-                                '${temp.path}/history_${item.timestamp.millisecondsSinceEpoch}.png');
-                            await file.writeAsBytes(bytes);
+                    // actions: [
+                    //   ActionButton(
+                    //     icon: Icons.download,
+                    //     label: "Download",
+                    //     onTap: () async {
+                    //       final Uint8List? bytes =
+                    //           await _capturePreview(previewKey);
+                    //       if (bytes != null) {
+                    //         await downloadFileToDownloads(context,
+                    //             fileName:
+                    //                 'history_${item.timestamp.millisecondsSinceEpoch}.png',
+                    //             bytes: bytes);
+                    //       }
+                    //     },
+                    //   ),
+                    //   ActionButton(
+                    //     icon: Icons.share,
+                    //     label: "Share",
+                    //     onTap: () async {
+                    //       final bytes = await _capturePreview(previewKey);
+                    //       if (bytes != null) {
+                    //         final temp = await getTemporaryDirectory();
+                    //         final file = File(
+                    //             '${temp.path}/history_${item.timestamp.millisecondsSinceEpoch}.png');
+                    //         await file.writeAsBytes(bytes);
 
-                            shareContent(
-                                text: item.content, files: [XFile(file.path)]);
-                          }
-                        },
-                      ),
-                      TextButton.icon(
-                        icon: const Icon(Icons.copy),
-                        label: const Text('Copy'),
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: item.content));
-                          if (context.mounted) {
-                            GlobalErrorHandler.showSuccessSnackBar(
-                                context, 'Copied to clipboard');
-                          }
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Close'),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
+                    //         shareContent(
+                    //             text: item.content, files: [XFile(file.path)]);
+                    //       }
+                    //     },
+                    //   ),
+                    //   ActionButton(
+                    //     icon: Icons.copy,
+                    //     label: 'Copy',
+                    //     onTap: () {
+                    //       Clipboard.setData(ClipboardData(text: item.content));
+                    //       if (context.mounted) {
+                    //         GlobalErrorHandler.showSuccessSnackBar(
+                    //             context, 'Copied to clipboard');
+                    //       }
+                    //     },
+                    //   ),
+                    //   ActionButton(
+                    //       icon: Icons.close,
+                    //       label: 'close',
+                    //       onTap: () => Navigator.of(context).pop()),
+                    // ],
                   ),
                 ),
               );
