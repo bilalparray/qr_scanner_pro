@@ -1,6 +1,7 @@
-// lib/screens/result_screen.dart
 import 'package:flutter/material.dart';
+import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/scan_result.dart';
+import 'package:qr_scanner/services/banner_ad.dart';
 import 'package:qr_scanner/widgets/action_button.dart';
 import '../services/action_handler.dart';
 
@@ -21,6 +22,8 @@ class ResultScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
+
               // ── Header card ───────────────────────────────────────────────
               Card(
                 elevation: 2,
@@ -38,6 +41,7 @@ class ResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
 
               // ── Action buttons ───────────────────────────────────────────
               Wrap(

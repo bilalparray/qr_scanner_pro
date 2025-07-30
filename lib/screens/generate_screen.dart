@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:qr_scanner/screens/settings_screen.dart';
+import 'package:qr_scanner/services/banner_ad.dart';
 import 'package:qr_scanner/utils/barcode_utils.dart';
 import 'package:qr_scanner/widgets/barcode_viewer.dart';
 import 'package:qr_scanner/widgets/barcode_customisation.dart';
@@ -20,6 +22,7 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
+import 'package:qr_scanner/services/ad_service.dart';
 
 class BarcodeHomePage extends StatefulWidget {
   const BarcodeHomePage({super.key});
@@ -96,6 +99,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
     setState(() => _isGenerating = true);
 
     try {
+      AdService.instance.showAppOpenAd(() {});
       await Future.delayed(const Duration(milliseconds: 300)); // UI feedback
       final widget = _buildBarcodeWidget();
       if (widget != null) {
@@ -357,7 +361,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   Widget build(BuildContext context) {
     final inputFields = BarcodeInputField.configForType(_selectedType);
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -386,6 +389,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                 selectedType: _selectedType,
                 onTypeChanged: _onBarcodeTypeChanged,
               ),
+              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
               BarcodeInputFields(
                 inputFields: inputFields,
                 controllers: _controllers,
@@ -466,6 +470,10 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                       borderRadius: BorderRadius.circular(16)),
                 ),
               ),
+              const SizedBox(
+                height: 5,
+              ),
+              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
               const SizedBox(height: 32),
               if (_generatedBarcode != null)
                 FadeTransition(

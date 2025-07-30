@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:qr_scanner/environment/environment.dart';
+import 'package:qr_scanner/services/banner_ad.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 import 'package:qr_scanner/models/history_model.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:qr_scanner/models/generate_code.dart';
+import 'package:provider/provider.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -131,19 +133,6 @@ class HistoryPage extends StatelessWidget {
     }
   }
 
-  // Future<Uint8List?> _capturePreview(GlobalKey key) async {
-  //   try {
-  //     final boundary =
-  //         key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-  //     if (boundary == null) return null;
-  //     final image = await boundary.toImage(pixelRatio: 3);
-  //     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-  //     return byteData?.buffer.asUint8List();
-  //   } catch (_) {
-  //     return null;
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,87 +178,80 @@ class HistoryPage extends StatelessWidget {
             return const Center(
                 child: Text('No history yet', style: TextStyle(fontSize: 16)));
           }
+
+          // Total items = history length + number of inserted banner ads
+          final int bannerCount = history.length ~/ 2;
+          final int totalItemCount = history.length + bannerCount;
+
           return ListView.separated(
             padding: const EdgeInsets.all(8),
-            itemCount: history.length,
+            itemCount: totalItemCount,
             separatorBuilder: (_, __) => const Divider(),
             itemBuilder: (context, index) {
-              final item = history[index];
-              final previewKey = GlobalKey();
-              return ListTile(
-                leading: Icon(
-                    item.isGenerated ? Icons.qr_code : Icons.qr_code_scanner),
-                title: Text(item.content,
-                    maxLines: 2, overflow: TextOverflow.ellipsis),
-                subtitle: Text(
-                    '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}'),
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: Text(item.isGenerated
-                        ? 'Preview & Actions'
-                        : 'Scanned Data'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RepaintBoundary(
-                            key: previewKey, child: _buildPreview(item)),
-                        const SizedBox(height: 16),
-                        SelectableText(item.snippet,
+              // Insert banner after every 2 items: positions 2, 5, 8, ...
+              if ((index + 1) % 3 == 0) {
+                // Banner position
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 0),
+                  child: IndependentBannerAdWidget(
+                    adUnitId: Environment.bannerAdUnitId,
+                    // Replace `bannerAdUnitId` with your real ID as needed
+                  ),
+                );
+              } else {
+                // Calculate the real history index accounting for banners inserted
+                final bannersBefore = index ~/ 3;
+                final historyIndex = index - bannersBefore;
+
+                final item = history[historyIndex];
+                final previewKey = GlobalKey();
+
+                return ListTile(
+                  leading: Icon(
+                      item.isGenerated ? Icons.qr_code : Icons.qr_code_scanner),
+                  title: Text(
+                    item.content,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
+                  ),
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: Text(
+                        item.isGenerated ? 'Preview & Actions' : 'Scanned Data',
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          RepaintBoundary(
+                              key: previewKey, child: _buildPreview(item)),
+                          const SizedBox(height: 16),
+                          SelectableText(
+                            item.snippet,
                             style: const TextStyle(
-                                fontFamily: 'monospace', fontSize: 12)),
+                              fontFamily: 'monospace',
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          IndependentBannerAdWidget(
+                            adUnitId: Environment.bannerAdUnitId,
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Close'),
+                        ),
                       ],
                     ),
-                    // actions: [
-                    //   ActionButton(
-                    //     icon: Icons.download,
-                    //     label: "Download",
-                    //     onTap: () async {
-                    //       final Uint8List? bytes =
-                    //           await _capturePreview(previewKey);
-                    //       if (bytes != null) {
-                    //         await downloadFileToDownloads(context,
-                    //             fileName:
-                    //                 'history_${item.timestamp.millisecondsSinceEpoch}.png',
-                    //             bytes: bytes);
-                    //       }
-                    //     },
-                    //   ),
-                    //   ActionButton(
-                    //     icon: Icons.share,
-                    //     label: "Share",
-                    //     onTap: () async {
-                    //       final bytes = await _capturePreview(previewKey);
-                    //       if (bytes != null) {
-                    //         final temp = await getTemporaryDirectory();
-                    //         final file = File(
-                    //             '${temp.path}/history_${item.timestamp.millisecondsSinceEpoch}.png');
-                    //         await file.writeAsBytes(bytes);
-
-                    //         shareContent(
-                    //             text: item.content, files: [XFile(file.path)]);
-                    //       }
-                    //     },
-                    //   ),
-                    //   ActionButton(
-                    //     icon: Icons.copy,
-                    //     label: 'Copy',
-                    //     onTap: () {
-                    //       Clipboard.setData(ClipboardData(text: item.content));
-                    //       if (context.mounted) {
-                    //         GlobalErrorHandler.showSuccessSnackBar(
-                    //             context, 'Copied to clipboard');
-                    //       }
-                    //     },
-                    //   ),
-                    //   ActionButton(
-                    //       icon: Icons.close,
-                    //       label: 'close',
-                    //       onTap: () => Navigator.of(context).pop()),
-                    // ],
                   ),
-                ),
-              );
+                );
+              }
             },
           );
         },
