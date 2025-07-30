@@ -374,6 +374,7 @@ class BarcodeInputField {
               key: 'email',
               label: 'Email Address',
               hint: 'example@example.com',
+              pattern: r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
               keyboardType: TextInputType.emailAddress),
           BarcodeInputField(
               key: 'subject',
@@ -398,6 +399,8 @@ class BarcodeInputField {
               key: 'email',
               label: 'Email',
               hint: 'jane.doe@example.com',
+              pattern: r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+              isRequired: false,
               keyboardType: TextInputType.emailAddress),
           BarcodeInputField(
               key: 'organization',
