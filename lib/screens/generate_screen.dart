@@ -473,7 +473,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
               const SizedBox(
                 height: 5,
               ),
-              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
               const SizedBox(height: 32),
               if (_generatedBarcode != null)
                 FadeTransition(

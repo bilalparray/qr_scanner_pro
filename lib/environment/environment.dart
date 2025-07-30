@@ -22,4 +22,6 @@ class Environment {
   static String rewardedAdUnitId = 'ca-app-pub-3821692834936093/9474368983';
   static String appOpenAdUnitId = 'ca-app-pub-3821692834936093/5435051621';
   static String nativeAdUnitId = 'ca-app-pub-3821692834936093/1846944800';
+
+  static String testBannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
 }

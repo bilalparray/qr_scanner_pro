@@ -22,8 +22,6 @@ class ResultScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
-
               // ── Header card ───────────────────────────────────────────────
               Card(
                 elevation: 2,

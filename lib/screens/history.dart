@@ -188,70 +188,58 @@ class HistoryPage extends StatelessWidget {
             itemCount: totalItemCount,
             separatorBuilder: (_, __) => const Divider(),
             itemBuilder: (context, index) {
-              // Insert banner after every 2 items: positions 2, 5, 8, ...
-              if ((index + 1) % 3 == 0) {
-                // Banner position
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 0),
-                  child: IndependentBannerAdWidget(
-                    adUnitId: Environment.bannerAdUnitId,
-                    // Replace `bannerAdUnitId` with your real ID as needed
-                  ),
-                );
-              } else {
-                // Calculate the real history index accounting for banners inserted
-                final bannersBefore = index ~/ 3;
-                final historyIndex = index - bannersBefore;
+              // Calculate the real history index accounting for banners inserted
+              final bannersBefore = index ~/ 3;
+              final historyIndex = index - bannersBefore;
 
-                final item = history[historyIndex];
-                final previewKey = GlobalKey();
+              final item = history[historyIndex];
+              final previewKey = GlobalKey();
 
-                return ListTile(
-                  leading: Icon(
-                      item.isGenerated ? Icons.qr_code : Icons.qr_code_scanner),
-                  title: Text(
-                    item.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
-                  ),
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: Text(
-                        item.isGenerated ? 'Preview & Actions' : 'Scanned Data',
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          RepaintBoundary(
-                              key: previewKey, child: _buildPreview(item)),
-                          const SizedBox(height: 16),
-                          SelectableText(
-                            item.snippet,
-                            style: const TextStyle(
-                              fontFamily: 'monospace',
-                              fontSize: 12,
-                            ),
+              return ListTile(
+                leading: Icon(
+                    item.isGenerated ? Icons.qr_code : Icons.qr_code_scanner),
+                title: Text(
+                  item.content,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
+                ),
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: Text(
+                      item.isGenerated ? 'Preview & Actions' : 'Scanned Data',
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RepaintBoundary(
+                            key: previewKey, child: _buildPreview(item)),
+                        const SizedBox(height: 16),
+                        SelectableText(
+                          item.snippet,
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 12,
                           ),
-                          const SizedBox(height: 16),
-                          IndependentBannerAdWidget(
-                            adUnitId: Environment.bannerAdUnitId,
-                          ),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Close'),
+                        ),
+                        const SizedBox(height: 16),
+                        IndependentBannerAdWidget(
+                          adUnitId: Environment.bannerAdUnitId,
                         ),
                       ],
                     ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Close'),
+                      ),
+                    ],
                   ),
-                );
-              }
+                ),
+              );
             },
           );
         },

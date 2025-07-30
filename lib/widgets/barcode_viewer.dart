@@ -48,7 +48,6 @@ class BarcodePreview extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
           RepaintBoundary(
             key: barcodeKey,
             child: Container(
@@ -131,7 +130,6 @@ class BarcodePreviewFullScreenPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: barcodeWidget,
             ),
-            IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
           ],
         ),
       ),
