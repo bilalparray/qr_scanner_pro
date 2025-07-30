@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_scanner/widgets/global_error.dart';
 
 Future<void> downloadFileToDownloads(
@@ -13,21 +12,21 @@ Future<void> downloadFileToDownloads(
   try {
     final safeName = fileName.split(Platform.pathSeparator).last;
 
-    if (Platform.isAndroid) {
-      if (await Permission.storage.isDenied ||
-          await Permission.manageExternalStorage.isDenied) {
-        final statuses = await [
-          Permission.storage,
-          Permission.manageExternalStorage,
-        ].request();
+    // if (Platform.isAndroid) {
+    //   if (await Permission.storage.isDenied ||
+    //       await Permission.manageExternalStorage.isDenied) {
+    //     final statuses = await [
+    //       Permission.storage,
+    //       Permission.manageExternalStorage,
+    //     ].request();
 
-        if (statuses[Permission.storage] != PermissionStatus.granted &&
-            statuses[Permission.manageExternalStorage] !=
-                PermissionStatus.granted) {
-          throw Exception("Storage permission denied");
-        }
-      }
-    }
+    //     if (statuses[Permission.storage] != PermissionStatus.granted &&
+    //         statuses[Permission.manageExternalStorage] !=
+    //             PermissionStatus.granted) {
+    //       throw Exception("Storage permission denied");
+    //     }
+    //   }
+    // }
 
     // 3️⃣ Determine the target directory.
     late final Directory downloadsDir;

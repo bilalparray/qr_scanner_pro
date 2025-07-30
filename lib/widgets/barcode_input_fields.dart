@@ -128,7 +128,7 @@ class BarcodeInputFields extends StatelessWidget {
               );
             } else {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 0),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: TextFormField(
                   controller: controller,
                   decoration: InputDecoration(
