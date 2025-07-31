@@ -9,7 +9,8 @@ class Environment {
   static const String textColor = '#333333';
 
   static const String developer = 'Bilal Ahmad Parray';
-
+  static const String playstoreProUrl =
+      'https://play.google.com/store/apps/details?id=com.qayham.qrscanner.pro';
   static const String playstoreUrl =
       'https://play.google.com/store/apps/details?id=com.qayham.qrscanner';
   static const String privacyPolicy =

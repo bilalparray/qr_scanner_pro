@@ -98,7 +98,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Remove Ads'),
             onTap: () {
               Navigator.pop(context);
-              launchUrl(Uri.parse(Environment.playstoreUrl));
+              GoRouter.of(context).go('/premium');
             },
           ),
         ],

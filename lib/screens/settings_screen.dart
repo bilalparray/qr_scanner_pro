@@ -99,7 +99,26 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           const Divider(height: 32, thickness: 1),
-
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Unlock Premium Features',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.titleLarge?.color,
+              ),
+            ),
+          ),
+          _buildSettingTile(
+            context,
+            icon: Icons.workspace_premium_outlined,
+            title: 'Enjoy Ad Free Experience',
+            subtitle: 'Unlock premium features',
+            onTap: () {
+              _launchUrl(Environment.playstoreProUrl);
+            },
+          ),
           // App Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
