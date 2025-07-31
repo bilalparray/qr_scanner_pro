@@ -1,4 +1,3 @@
-// lib/screens/scan_screen.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -12,14 +11,17 @@ import '../services/qr_parser.dart';
 import '../widgets/scan_overlay.dart';
 
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  final bool startGallery;
+  const ScanScreen({super.key, required this.startGallery});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
 }
 
 class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
-  final MobileScannerController _ctrl = MobileScannerController();
+  final MobileScannerController _ctrl = MobileScannerController(
+    returnImage: false,
+  );
   final ImagePicker _picker = ImagePicker();
   bool _isBusy = false;
   bool _analyzingImage = false;
@@ -28,11 +30,19 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    if (widget.startGallery) {
+      // Use addPostFrameCallback to avoid calling during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pickFromGallery();
+      });
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _ctrl.stop(); // stop on dispose
     _ctrl.dispose();
     super.dispose();
   }
@@ -116,6 +126,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       }
 
       _showLoadingDialog();
+      await _ctrl.stop();
       final capture = await _ctrl.analyzeImage(file.path);
       if (!mounted) return;
       Navigator.of(context).pop(); // close loading
@@ -135,6 +146,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       if (Navigator.of(context).canPop()) Navigator.of(context).pop();
       _showErrorDialog('Image analysis failed: $e');
     } finally {
+      await _ctrl.start();
       setState(() => _analyzingImage = false);
     }
   }

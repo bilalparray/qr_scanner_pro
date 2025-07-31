@@ -54,9 +54,19 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Scan QR/Barcode'),
             onTap: () {
               Navigator.pop(context);
-              GoRouter.of(context).go('/scan');
+              // GoRouter.of(context).go('/scan');
+              context.push('/scan');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text('Scan from Gallery'),
+            onTap: () {
+              Navigator.pop(context); // close drawer
+              context.push('/scan?startGallery=true');
+            },
+          ),
+
           ListTile(
             leading: const Icon(Icons.add_box_rounded),
             title: const Text('Generate Barcode'),

@@ -29,7 +29,11 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/scan',
-      builder: (context, state) => const ScanScreen(),
-    ),
+      builder: (context, state) {
+        final startGallery = state.uri.queryParameters['startGallery'] ==
+            'true'; // Use null-safe casting
+        return ScanScreen(startGallery: startGallery);
+      },
+    )
   ],
 );
