@@ -2,7 +2,7 @@ name: qr_scanner
 description: A Flutter QR Code and Barcode Scanner/Generator with AdMob Integration
 publish_to: "none"
 
-version: 0.1.2+16
+version: 0.1.3+17
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
