@@ -30,7 +30,7 @@ class AppDrawer extends StatelessWidget {
                     height: 64,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 5),
                 const Text(
                   'QR & Barcode App',
                   style: TextStyle(
@@ -38,7 +38,7 @@ class AppDrawer extends StatelessWidget {
                       fontSize: 22,
                       fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 1),
                 const Text(
                   'Ultimate QR & Barcode Suite',
                   style: TextStyle(

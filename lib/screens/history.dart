@@ -3,16 +3,27 @@ import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/services/banner_ad.dart';
+import 'package:qr_scanner/services/ad_service.dart';
 import 'package:qr_scanner/widgets/drawer.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
-
 import 'package:qr_scanner/models/history_model.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:qr_scanner/models/generate_code.dart';
 import 'package:provider/provider.dart';
 
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+    AdService.instance.showInterstitialAd(() {});
+  }
 
   String _formatTimestamp(DateTime timestamp) {
     return DateFormat('yyyy-MM-dd HH:mm').format(timestamp);
@@ -190,10 +201,8 @@ class HistoryPage extends StatelessWidget {
             itemCount: totalItemCount,
             separatorBuilder: (_, __) => const Divider(),
             itemBuilder: (context, index) {
-              // Calculate the real history index accounting for banners inserted
               final bannersBefore = index ~/ 3;
               final historyIndex = index - bannersBefore;
-
               final item = history[historyIndex];
               final previewKey = GlobalKey();
 

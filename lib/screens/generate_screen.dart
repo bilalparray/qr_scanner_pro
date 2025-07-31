@@ -58,6 +58,8 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   void initState() {
     super.initState();
+    AdService.instance.showInterstitialAd(() {});
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -99,7 +101,7 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
     setState(() => _isGenerating = true);
 
     try {
-      AdService.instance.showAppOpenAd(() {});
+      AdService.instance.showRewardedAd(() {});
       await Future.delayed(const Duration(milliseconds: 300)); // UI feedback
       final widget = _buildBarcodeWidget();
       if (widget != null) {

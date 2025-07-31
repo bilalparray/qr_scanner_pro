@@ -6,6 +6,7 @@ import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/models/scan_result.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:qr_scanner/screens/scan_result_screen.dart';
+import 'package:qr_scanner/services/ad_service.dart';
 import 'package:qr_scanner/widgets/drawer.dart';
 import '../services/qr_parser.dart';
 import '../widgets/scan_overlay.dart';
@@ -29,6 +30,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    AdService.instance.showAppOpenAd(() {});
     WidgetsBinding.instance.addObserver(this);
 
     if (widget.startGallery) {

@@ -80,20 +80,20 @@ class AdService {
     );
 
     // Native Ad
-    _nativeAd = NativeAd(
-      adUnitId: Environment.nativeAdUnitId,
-      factoryId: 'listTile',
-      request: const AdRequest(),
-      listener: NativeAdListener(
-        onAdLoaded: (_) {
-          if (kDebugMode) print('NativeAd loaded');
-        },
-        onAdFailedToLoad: (ad, error) {
-          if (kDebugMode) print('NativeAd failed to load: $error');
-          ad.dispose();
-        },
-      ),
-    )..load();
+    // _nativeAd = NativeAd(
+    //   adUnitId: Environment.nativeAdUnitId,
+    //   factoryId: 'listTile',
+    //   request: const AdRequest(),
+    //   listener: NativeAdListener(
+    //     onAdLoaded: (_) {
+    //       if (kDebugMode) print('NativeAd loaded');
+    //     },
+    //     onAdFailedToLoad: (ad, error) {
+    //       if (kDebugMode) print('NativeAd failed to load: $error');
+    //       ad.dispose();
+    //     },
+    //   ),
+    // )..load();
   }
 
   /// Show interstitial and reload after dismissed
