@@ -1,4 +1,3 @@
-// lib/models/scan_result_model.dart
 enum ScanDataType {
   url,
   contact,

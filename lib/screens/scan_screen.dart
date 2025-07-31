@@ -91,7 +91,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   void _onDetect(BarcodeCapture cap) async {
     if (_isBusy || cap.barcodes.isEmpty) return;
     setState(() => _isBusy = true);
-
+    await _ctrl.stop(); // ❶ Stop camera before navigation
     final raw = cap.barcodes.first.rawValue ?? '';
     final format = cap.barcodes.first.format;
     final codeType = _mapFormatToEnum(format);
@@ -107,8 +107,9 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       codeType: codeType,
       isGenerated: false,
     );
+    await _ctrl.start(); // ❷ Restart camera after result screen returns
 
-    setState(() => _isBusy = false);
+    if (mounted) setState(() => _isBusy = false);
   }
 
   // ── gallery import ────────────────────────────────────────────────────────

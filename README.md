@@ -138,7 +138,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) if present, or open an issue with your fe
 
 ## License
 
-MIT (or your chosen license)
+MIT
 
 ---
 

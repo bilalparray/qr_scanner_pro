@@ -25,7 +25,7 @@ android {
         applicationId = "com.qayham.qrscanner"
         minSdk = providers.gradleProperty("flutter.minSdkVersion").map(String::toInt).getOrElse(23)
         targetSdk = providers.gradleProperty("flutter.targetSdkVersion").map(String::toInt).getOrElse(35)
-        versionCode = providers.gradleProperty("flutter.versionCode").map(String::toInt).getOrElse(17)
+        versionCode = providers.gradleProperty("flutter.versionCode").map(String::toInt).getOrElse(18)
         versionName = providers.gradleProperty("flutter.versionName").getOrElse("0.1.3")
     }
 
