@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/environment/environment.dart';
@@ -14,6 +13,7 @@ import 'package:qr_scanner/widgets/barcode_customisation.dart';
 import 'package:qr_scanner/widgets/barcode_input_fields.dart';
 import 'package:qr_scanner/widgets/code_type_selector.dart';
 import 'package:qr_scanner/widgets/download.dart';
+import 'package:qr_scanner/widgets/drawer.dart';
 import 'package:qr_scanner/widgets/global_error.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'dart:async';
@@ -362,16 +362,12 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   Widget build(BuildContext context) {
     final inputFields = BarcodeInputField.configForType(_selectedType);
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(_selectedType.category.icon),
-            const SizedBox(width: 8),
-            Text('Generate ${_selectedType.displayName}'),
-          ],
-        ),
+        title: Text('Generate ${_selectedType.displayName}'),
         actions: [
           IconButton(
+              tooltip: 'Settings',
               icon: const Icon(Icons.settings),
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const SettingsPage())))

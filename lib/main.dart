@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
-import 'package:qr_scanner/screens/home_screen.dart';
+import 'package:qr_scanner/routes/app_routes.dart';
 import 'package:qr_scanner/services/ad_service.dart';
 
 void main() async {
@@ -19,20 +18,6 @@ void main() async {
   ));
 }
 
-// Define your GoRouter routes
-final GoRouter _router = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const HomeScreen(),
-    ),
-    GoRoute(
-      path: '/products/qrscanner',
-      builder: (context, state) => const HomeScreen(),
-    ),
-  ],
-);
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -44,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routerConfig: _router,
+      routerConfig: appRouter,
     );
   }
 }

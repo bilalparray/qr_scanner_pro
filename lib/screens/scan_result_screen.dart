@@ -3,6 +3,7 @@ import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/models/scan_result.dart';
 import 'package:qr_scanner/services/banner_ad.dart';
 import 'package:qr_scanner/widgets/action_button.dart';
+import 'package:qr_scanner/widgets/drawer.dart';
 import '../services/action_handler.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -15,6 +16,7 @@ class ResultScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(title: const Text('Scan Result')),
       body: SafeArea(
         child: Padding(

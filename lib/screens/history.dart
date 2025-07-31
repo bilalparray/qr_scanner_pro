@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/environment/environment.dart';
 import 'package:qr_scanner/services/banner_ad.dart';
+import 'package:qr_scanner/widgets/drawer.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 import 'package:qr_scanner/models/history_model.dart';
@@ -136,8 +137,9 @@ class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Scan & Generation History'),
+        title: const Text('History'),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_sweep),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qr_scanner/environment/environment.dart';
+import 'package:qr_scanner/widgets/drawer.dart';
 import 'package:qr_scanner/widgets/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -55,6 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Settings'),
         centerTitle: true,
