@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:qr_scanner/environment/environment.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -12,7 +10,6 @@ class AppDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          // You might want to use your own app logo/icon here
           DrawerHeader(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primary,
@@ -20,7 +17,6 @@ class AppDrawer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Swap with your logo if available
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 32,
@@ -54,25 +50,23 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Scan QR/Barcode'),
             onTap: () {
               Navigator.pop(context);
-              // GoRouter.of(context).go('/scan');
-              context.push('/scan');
+              context.go('/scan'); // Use GoRouter's navigation
             },
           ),
           ListTile(
             leading: const Icon(Icons.photo_library),
             title: const Text('Scan from Gallery'),
             onTap: () {
-              Navigator.pop(context); // close drawer
-              context.push('/scan?startGallery=true');
+              Navigator.pop(context);
+              context.go('/scan?startGallery=true');
             },
           ),
-
           ListTile(
             leading: const Icon(Icons.add_box_rounded),
             title: const Text('Generate Barcode'),
             onTap: () {
               Navigator.pop(context);
-              GoRouter.of(context).go('/generate');
+              context.go('/generate');
             },
           ),
           ListTile(
@@ -80,7 +74,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Scan & Generation History'),
             onTap: () {
               Navigator.pop(context);
-              GoRouter.of(context).go('/history');
+              context.go('/history');
             },
           ),
           const Divider(),
@@ -89,16 +83,15 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Settings'),
             onTap: () {
               Navigator.pop(context);
-              GoRouter.of(context).go('/settings');
+              context.go('/settings');
             },
           ),
-
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: const Text('Remove Ads'),
             onTap: () {
               Navigator.pop(context);
-              GoRouter.of(context).go('/premium');
+              context.go('/premium');
             },
           ),
         ],
