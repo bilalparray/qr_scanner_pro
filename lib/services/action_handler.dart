@@ -1,7 +1,8 @@
 import 'dart:io';
+import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_contacts/flutter_contacts.dart' hide Event;
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_scanner/models/scan_result.dart';
 import 'package:share_plus/share_plus.dart';
@@ -56,41 +57,14 @@ class ActionHandler {
         await _openUri(ctx, Uri.parse('sms:$phone?body=$msg'));
         break;
       case ScanDataType.calendar:
-        _snack(ctx, 'Add to calendar via share/import');
+        addToCalender(ctx, result);
         break;
       case ScanDataType.contact:
         saveContactFromVCard(ctx, result.raw);
-        _snack(ctx, 'Use vCard file to import contact');
         break;
 
       case ScanDataType.wifi:
-        // Assuming your parsed Wi-Fi info contains SSID and password
-        final ssid = result.parsed?['ssid'] ?? '';
-        final password = result.parsed?['password'] ?? '';
-        final security = result.parsed?['type'] ?? 'WPA'; // or 'WEP', or 'NONE'
-
-        if (ssid.isNotEmpty) {
-          // Attempt to connect to the Wi-Fi network
-          final bool connected = await WiFiForIoTPlugin.connect(
-            ssid,
-            password: password,
-            security: security.toLowerCase() == 'wep'
-                ? NetworkSecurity.WEP
-                : security.toLowerCase() == 'none'
-                    ? NetworkSecurity.NONE
-                    : NetworkSecurity.WPA,
-            joinOnce: true,
-            withInternet: true,
-          );
-
-          if (connected) {
-            _snack(ctx, 'Connected to Wi-Fi: $ssid');
-          } else {
-            _snack(ctx, 'Failed to connect to Wi-Fi: $ssid');
-          }
-        } else {
-          _snack(ctx, 'SSID not found in Wi-Fi credentials');
-        }
+        connectToWifi(ctx, result);
         break;
 
       case ScanDataType.text:
@@ -167,6 +141,81 @@ class ActionHandler {
       _snack(ctx, 'Contact saved successfully.');
     } catch (e) {
       _snack(ctx, 'Failed to save contact: $e');
+    }
+  }
+
+  static Future<void> connectToWifi(ctx, result) async {
+    // Assuming your parsed Wi-Fi info contains SSID and password
+    final ssid = result.parsed?['ssid'] ?? '';
+    final password = result.parsed?['password'] ?? '';
+    final security = result.parsed?['type'] ?? 'WPA'; // or 'WEP', or 'NONE'
+
+    if (ssid.isNotEmpty) {
+      // Attempt to connect to the Wi-Fi network
+      final bool connected = await WiFiForIoTPlugin.connect(
+        ssid,
+        password: password,
+        security: security.toLowerCase() == 'wep'
+            ? NetworkSecurity.WEP
+            : security.toLowerCase() == 'none'
+                ? NetworkSecurity.NONE
+                : NetworkSecurity.WPA,
+        joinOnce: true,
+        withInternet: true,
+      );
+
+      if (connected) {
+        _snack(ctx, 'Connected to Wi-Fi: $ssid');
+      } else {
+        _snack(ctx, 'Failed to connect to Wi-Fi: $ssid');
+      }
+    } else {
+      _snack(ctx, 'SSID not found in Wi-Fi credentials');
+    }
+  }
+
+  static Future<void> addToCalender(BuildContext ctx, dynamic result) async {
+    try {
+      // Extract event details from result.parsed or raw data
+      // Adjust keys according to your parsing logic
+      final String title = result.parsed?['summary'] ?? 'Untitled Event';
+      final String description = result.parsed?['description'] ?? '';
+      final String location = result.parsed?['location'] ?? '';
+
+      // Parse start and end date/time strings into DateTime objects
+      // Expecting ISO8601 or similar format in your parsed data
+      DateTime? startDate;
+      DateTime? endDate;
+      if (result.parsed?['dtstart'] != null) {
+        startDate = DateTime.tryParse(result.parsed['dtstart']);
+      }
+      if (result.parsed?['dtend'] != null) {
+        endDate = DateTime.tryParse(result.parsed['dtend']);
+      }
+
+      // If startDate is null, fallback to now
+      startDate ??= DateTime.now();
+
+      // If endDate is null, fallback to 1 hour after startDate
+      endDate ??= startDate.add(Duration(hours: 1));
+
+      final event = Event(
+        title: title,
+        description: description,
+        location: location,
+        startDate: startDate,
+        endDate: endDate,
+        // You can set other parameters like allDay, iosParams, androidParams here if needed
+      );
+
+      final success = await Add2Calendar.addEvent2Cal(event);
+      if (success) {
+        _snack(ctx, 'Event added to calendar');
+      } else {
+        _snack(ctx, 'Failed to add event to calendar');
+      }
+    } catch (e) {
+      _snack(ctx, 'Failed to add event to calendar: $e');
     }
   }
 }
