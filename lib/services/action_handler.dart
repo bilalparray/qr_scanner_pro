@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:qr_scanner/models/scan_result.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wifi_iot/wifi_iot.dart';
 
 class ActionHandler {
   const ActionHandler._();
@@ -59,9 +60,37 @@ class ActionHandler {
       case ScanDataType.contact:
         _snack(ctx, 'Use vCard file to import contact');
         break;
+
       case ScanDataType.wifi:
-        _snack(ctx, 'Wi-Fi credentials copied');
+        // Assuming your parsed Wi-Fi info contains SSID and password
+        final ssid = result.parsed?['ssid'] ?? '';
+        final password = result.parsed?['password'] ?? '';
+        final security = result.parsed?['type'] ?? 'WPA'; // or 'WEP', or 'NONE'
+
+        if (ssid.isNotEmpty) {
+          // Attempt to connect to the Wi-Fi network
+          final bool connected = await WiFiForIoTPlugin.connect(
+            ssid,
+            password: password,
+            security: security.toLowerCase() == 'wep'
+                ? NetworkSecurity.WEP
+                : security.toLowerCase() == 'none'
+                    ? NetworkSecurity.NONE
+                    : NetworkSecurity.WPA,
+            joinOnce: true,
+            withInternet: true,
+          );
+
+          if (connected) {
+            _snack(ctx, 'Connected to Wi-Fi: $ssid');
+          } else {
+            _snack(ctx, 'Failed to connect to Wi-Fi: $ssid');
+          }
+        } else {
+          _snack(ctx, 'SSID not found in Wi-Fi credentials');
+        }
         break;
+
       case ScanDataType.text:
         // nothing special
         break;
