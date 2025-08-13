@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_scanner/models/scan_result.dart';
 import 'package:share_plus/share_plus.dart';
@@ -58,6 +59,7 @@ class ActionHandler {
         _snack(ctx, 'Add to calendar via share/import');
         break;
       case ScanDataType.contact:
+        saveContactFromVCard(ctx, result.raw);
         _snack(ctx, 'Use vCard file to import contact');
         break;
 
@@ -115,5 +117,56 @@ class ActionHandler {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(content: Text(msg)),
     );
+  }
+
+  static Future<void> saveContactFromVCard(
+      BuildContext ctx, String rawVCard) async {
+    await FlutterContacts.requestPermission();
+    if (!await FlutterContacts.requestPermission()) {
+      _snack(ctx, 'Contact permission denied');
+      return;
+    }
+
+    try {
+      String? getValue(String key, String rawVCard) {
+        // Matches KEY optionally followed by parameters (;XXX=YYY), then a colon and value
+        final pattern = RegExp(
+          '^${RegExp.escape(key)}(?:;[^:]+)?:\\s*(.*)\$',
+          caseSensitive: false,
+          multiLine: true,
+        );
+
+        final match = pattern.firstMatch(rawVCard);
+        if (match != null && match.groupCount >= 1) {
+          return match.group(1)?.trim();
+        }
+        return null;
+      }
+
+      // Extract fields manually (example for FN, TEL, EMAIL)
+      final fullName = getValue('FN', rawVCard) ?? '';
+      final phone = getValue('TEL', rawVCard) ?? '';
+      final email = getValue('EMAIL', rawVCard) ?? '';
+
+      final contact = Contact();
+
+      if (fullName.isNotEmpty) {
+        // You can further split the fullName into first/last if you want
+        contact.name = Name(first: fullName);
+      }
+
+      if (phone.isNotEmpty) {
+        contact.phones = [Phone(phone, label: PhoneLabel.mobile)];
+      }
+
+      if (email.isNotEmpty) {
+        contact.emails = [Email(email)];
+      }
+
+      await contact.insert();
+      _snack(ctx, 'Contact saved successfully.');
+    } catch (e) {
+      _snack(ctx, 'Failed to save contact: $e');
+    }
   }
 }
