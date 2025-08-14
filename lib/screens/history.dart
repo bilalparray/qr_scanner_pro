@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_scanner/environment/environment.dart';
-import 'package:qr_scanner/services/banner_ad.dart';
+import 'package:qr_scanner/models/generate_code.dart';
 import 'package:qr_scanner/services/ad_service.dart';
+import 'package:qr_scanner/services/banner_ad.dart';
 import 'package:qr_scanner/widgets/drawer.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'package:qr_scanner/models/history_model.dart';
 import 'package:qr_scanner/providers/history_provider.dart';
-import 'package:qr_scanner/models/generate_code.dart';
 import 'package:provider/provider.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -145,8 +145,48 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  // --- Helper: show preview dialog (no banner inside the dialog) ---
+  void _showPreviewDialog(BuildContext context, HistoryItem item) {
+    final previewKey = GlobalKey();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(item.isGenerated ? 'Preview & Actions' : 'Scanned Data'),
+        content: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RepaintBoundary(key: previewKey, child: _buildPreview(item)),
+                const SizedBox(height: 16),
+                SelectableText(
+                  item.snippet,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Scaffold: top AppBar + Drawer as before
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
@@ -184,76 +224,46 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ],
       ),
-      body: Consumer<HistoryProvider>(
-        builder: (context, provider, _) {
-          final history = provider.history;
-          if (history.isEmpty) {
-            return const Center(
-                child: Text('No history yet', style: TextStyle(fontSize: 16)));
-          }
+      body: Column(
+        children: [
+          IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
+          Expanded(
+            child: Consumer<HistoryProvider>(
+              builder: (context, provider, _) {
+                final history = provider.history;
+                if (history.isEmpty) {
+                  return const Center(
+                    child:
+                        Text('No history yet', style: TextStyle(fontSize: 16)),
+                  );
+                }
 
-          // Total items = history length + number of inserted banner ads
-          final int bannerCount = history.length ~/ 2;
-          final int totalItemCount = history.length + bannerCount;
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(8),
-            itemCount: totalItemCount,
-            separatorBuilder: (_, __) => const Divider(),
-            itemBuilder: (context, index) {
-              final bannersBefore = index ~/ 3;
-              final historyIndex = index - bannersBefore;
-              final item = history[historyIndex];
-              final previewKey = GlobalKey();
-
-              return ListTile(
-                leading: Icon(
-                    item.isGenerated ? Icons.qr_code : Icons.qr_code_scanner),
-                title: Text(
-                  item.content,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Text(
-                  '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
-                ),
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: Text(
-                      item.isGenerated ? 'Preview & Actions' : 'Scanned Data',
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RepaintBoundary(
-                            key: previewKey, child: _buildPreview(item)),
-                        const SizedBox(height: 16),
-                        SelectableText(
-                          item.snippet,
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        IndependentBannerAdWidget(
-                          adUnitId: Environment.bannerAdUnitId,
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Close'),
+                return ListView.separated(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: history.length,
+                  separatorBuilder: (_, __) => const Divider(),
+                  itemBuilder: (context, index) {
+                    final item = history[index];
+                    return ListTile(
+                      leading: Icon(item.isGenerated
+                          ? Icons.qr_code
+                          : Icons.qr_code_scanner),
+                      title: Text(
+                        item.content,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
+                      subtitle: Text(
+                        '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
+                      ),
+                      onTap: () => _showPreviewDialog(context, item),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
