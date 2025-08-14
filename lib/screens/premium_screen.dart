@@ -125,6 +125,15 @@ class PremiumScreen extends StatelessWidget {
                         color: Colors.white, fontSize: 16, letterSpacing: 1.2),
                     textAlign: TextAlign.center,
                   ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Actual price may vary based on your location. Please confirm with Google Play Store.',
+                  style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                      letterSpacing: 1),
+                  textAlign: TextAlign.center,
                 )
               ],
             ),
