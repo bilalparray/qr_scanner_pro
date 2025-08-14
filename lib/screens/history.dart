@@ -187,83 +187,86 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     // Scaffold: top AppBar + Drawer as before
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        title: const Text('History'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_sweep),
-            tooltip: 'Clear History',
-            onPressed: () {
-              final provider = context.read<HistoryProvider>();
-              if (provider.history.isNotEmpty) {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Clear All History?'),
-                    content: const Text(
-                        'This will remove all your history records.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          provider.clearHistory();
-                          Navigator.of(ctx).pop();
-                        },
-                        child: const Text('Clear'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
-          Expanded(
-            child: Consumer<HistoryProvider>(
-              builder: (context, provider, _) {
-                final history = provider.history;
-                if (history.isEmpty) {
-                  return const Center(
-                    child:
-                        Text('No history yet', style: TextStyle(fontSize: 16)),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        drawer: const AppDrawer(),
+        appBar: AppBar(
+          title: const Text('History'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.delete_sweep),
+              tooltip: 'Clear History',
+              onPressed: () {
+                final provider = context.read<HistoryProvider>();
+                if (provider.history.isNotEmpty) {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Clear All History?'),
+                      content: const Text(
+                          'This will remove all your history records.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            provider.clearHistory();
+                            Navigator.of(ctx).pop();
+                          },
+                          child: const Text('Clear'),
+                        ),
+                      ],
+                    ),
                   );
                 }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: history.length,
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemBuilder: (context, index) {
-                    final item = history[index];
-                    return ListTile(
-                      leading: Icon(item.isGenerated
-                          ? Icons.qr_code
-                          : Icons.qr_code_scanner),
-                      title: Text(
-                        item.content,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
-                      ),
-                      onTap: () => _showPreviewDialog(context, item),
-                    );
-                  },
-                );
               },
             ),
-          ),
-        ],
+          ],
+        ),
+        body: Column(
+          children: [
+            IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
+            Expanded(
+              child: Consumer<HistoryProvider>(
+                builder: (context, provider, _) {
+                  final history = provider.history;
+                  if (history.isEmpty) {
+                    return const Center(
+                      child: Text('No history yet',
+                          style: TextStyle(fontSize: 16)),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: history.length,
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final item = history[index];
+                      return ListTile(
+                        leading: Icon(item.isGenerated
+                            ? Icons.qr_code
+                            : Icons.qr_code_scanner),
+                        title: Text(
+                          item.content,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          '${item.isGenerated ? 'Generated' : 'Scanned'} on ${_formatTimestamp(item.timestamp)}',
+                        ),
+                        onTap: () => _showPreviewDialog(context, item),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

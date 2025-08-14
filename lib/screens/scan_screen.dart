@@ -200,86 +200,89 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        title: const Text('Scan QR Code'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.photo_library),
-            tooltip: 'Pick from Gallery',
-            onPressed: _analyzingImage ? null : _pickFromGallery,
-          ),
-        ],
-      ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          MobileScanner(controller: _ctrl, onDetect: _onDetect),
-          const ScanOverlay(),
-          if (_isBusy)
-            Container(
-              color: Colors.black45,
-              child: const Center(child: CircularProgressIndicator()),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        drawer: const AppDrawer(),
+        appBar: AppBar(
+          title: const Text('Scan QR Code'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.photo_library),
+              tooltip: 'Pick from Gallery',
+              onPressed: _analyzingImage ? null : _pickFromGallery,
             ),
+          ],
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            MobileScanner(controller: _ctrl, onDetect: _onDetect),
+            const ScanOverlay(),
+            if (_isBusy)
+              Container(
+                color: Colors.black45,
+                child: const Center(child: CircularProgressIndicator()),
+              ),
 
-          // ── bottom controls ───────────────────────────────────────────────
-          Positioned(
-            bottom: 24,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // flash
-                _CircleButton(
-                  onPressed: _ctrl.toggleTorch,
-                  child: ValueListenableBuilder<MobileScannerState>(
-                    valueListenable: _ctrl,
-                    builder: (_, state, __) => Icon(
-                      switch (state.torchState) {
-                        TorchState.on => Icons.flash_on,
-                        TorchState.auto => Icons.flash_auto,
-                        _ => Icons.flash_off,
-                      },
-                      color: Colors.white,
-                      size: 32,
+            // ── bottom controls ───────────────────────────────────────────────
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // flash
+                  _CircleButton(
+                    onPressed: _ctrl.toggleTorch,
+                    child: ValueListenableBuilder<MobileScannerState>(
+                      valueListenable: _ctrl,
+                      builder: (_, state, __) => Icon(
+                        switch (state.torchState) {
+                          TorchState.on => Icons.flash_on,
+                          TorchState.auto => Icons.flash_auto,
+                          _ => Icons.flash_off,
+                        },
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
                   ),
-                ),
-                // gallery
-                _CircleButton(
-                  onPressed: _analyzingImage ? null : _pickFromGallery,
-                  child: _analyzingImage
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.photo_library,
-                          color: Colors.white, size: 32),
-                ),
-                // camera switch
-                _CircleButton(
-                  onPressed: _ctrl.switchCamera,
-                  child: ValueListenableBuilder<MobileScannerState>(
-                    valueListenable: _ctrl,
-                    builder: (_, state, __) => Icon(
-                      state.cameraDirection == CameraFacing.front
-                          ? Icons.camera_front
-                          : Icons.camera_rear,
-                      color: Colors.white,
-                      size: 32,
+                  // gallery
+                  _CircleButton(
+                    onPressed: _analyzingImage ? null : _pickFromGallery,
+                    child: _analyzingImage
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.photo_library,
+                            color: Colors.white, size: 32),
+                  ),
+                  // camera switch
+                  _CircleButton(
+                    onPressed: _ctrl.switchCamera,
+                    child: ValueListenableBuilder<MobileScannerState>(
+                      valueListenable: _ctrl,
+                      builder: (_, state, __) => Icon(
+                        state.cameraDirection == CameraFacing.front
+                            ? Icons.camera_front
+                            : Icons.camera_rear,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

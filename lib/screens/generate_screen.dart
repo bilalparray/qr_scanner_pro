@@ -363,131 +363,135 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   Widget build(BuildContext context) {
     final inputFields = BarcodeInputField.configForType(_selectedType);
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        title: Text('Generate ${_selectedType.displayName}'),
-        actions: [
-          IconButton(
-              tooltip: 'Settings',
-              icon: const Icon(Icons.settings),
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const SettingsPage())))
-        ],
-      ),
-      body: SafeArea(
-        child: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          key: _formKey,
-          child: ListView(
-            controller: _scrollController, // attach the scroll controller
-            padding: const EdgeInsets.all(5),
-            children: [
-              BarcodeTypeSelector(
-                selectedType: _selectedType,
-                onTypeChanged: _onBarcodeTypeChanged,
-              ),
-              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
-              BarcodeInputFields(
-                inputFields: inputFields,
-                controllers: _controllers,
-                onChange: () => setState(() => _generatedBarcode = null),
-              ),
-              BarcodeCustomization(
-                foregroundColor: _foregroundColor,
-                backgroundColor: _backgroundColor,
-                width: _barcodeWidth,
-                height: _barcodeHeight,
-                showValue: _showValue,
-                onForegroundColorChanged: (color) {
-                  setState(() {
-                    _foregroundColor = color;
-                    if (_generatedBarcode != null) {
-                      _generatedBarcode = _buildBarcodeWidget();
-                    }
-                  });
-                },
-                onBackgroundColorChanged: (color) {
-                  setState(() {
-                    _backgroundColor = color;
-                    if (_generatedBarcode != null) {
-                      _generatedBarcode = _buildBarcodeWidget();
-                    }
-                  });
-                },
-                onWidthChanged: (width) {
-                  setState(() {
-                    _barcodeWidth = width;
-                    if (_generatedBarcode != null) {
-                      _generatedBarcode = _buildBarcodeWidget();
-                    }
-                  });
-                },
-                onHeightChanged: (height) {
-                  setState(() {
-                    _barcodeHeight = height;
-                    if (_generatedBarcode != null) {
-                      _generatedBarcode = _buildBarcodeWidget();
-                    }
-                  });
-                },
-                onShowValueChanged: (show) {
-                  setState(() {
-                    _showValue = show;
-                    if (_generatedBarcode != null) {
-                      _generatedBarcode = _buildBarcodeWidget();
-                    }
-                  });
-                },
-                isShowValueEnabled: !_selectedType.isQR && !_selectedType.is2D,
-              ),
-              ElevatedButton.icon(
-                onPressed: _isGenerating ? null : _generateBarcode,
-                icon: _isGenerating
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.qr_code_2,
-                        size: 28, color: Colors.white),
-                label: Text(
-                  _isGenerating
-                      ? 'Generating...'
-                      : 'Generate ${_selectedType.displayName}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        drawer: const AppDrawer(),
+        appBar: AppBar(
+          title: Text('Generate ${_selectedType.displayName}'),
+          actions: [
+            IconButton(
+                tooltip: 'Settings',
+                icon: const Icon(Icons.settings),
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const SettingsPage())))
+          ],
+        ),
+        body: SafeArea(
+          child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            key: _formKey,
+            child: ListView(
+              controller: _scrollController, // attach the scroll controller
+              padding: const EdgeInsets.all(5),
+              children: [
+                BarcodeTypeSelector(
+                  selectedType: _selectedType,
+                  onTypeChanged: _onBarcodeTypeChanged,
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
+                BarcodeInputFields(
+                  inputFields: inputFields,
+                  controllers: _controllers,
+                  onChange: () => setState(() => _generatedBarcode = null),
                 ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              const SizedBox(height: 32),
-              if (_generatedBarcode != null)
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: KeyedSubtree(
-                    key: _previewSectionKey,
-                    child: BarcodePreview(
-                      barcodeKey: _barcodeKey,
-                      backgroundColor: _backgroundColor,
-                      onShare: _shareBarcode,
-                      onSave: _downloadBarcode,
-                      onViewFullScreen: _viewBarcodeFullScreen,
-                      child: _generatedBarcode!,
+                BarcodeCustomization(
+                  foregroundColor: _foregroundColor,
+                  backgroundColor: _backgroundColor,
+                  width: _barcodeWidth,
+                  height: _barcodeHeight,
+                  showValue: _showValue,
+                  onForegroundColorChanged: (color) {
+                    setState(() {
+                      _foregroundColor = color;
+                      if (_generatedBarcode != null) {
+                        _generatedBarcode = _buildBarcodeWidget();
+                      }
+                    });
+                  },
+                  onBackgroundColorChanged: (color) {
+                    setState(() {
+                      _backgroundColor = color;
+                      if (_generatedBarcode != null) {
+                        _generatedBarcode = _buildBarcodeWidget();
+                      }
+                    });
+                  },
+                  onWidthChanged: (width) {
+                    setState(() {
+                      _barcodeWidth = width;
+                      if (_generatedBarcode != null) {
+                        _generatedBarcode = _buildBarcodeWidget();
+                      }
+                    });
+                  },
+                  onHeightChanged: (height) {
+                    setState(() {
+                      _barcodeHeight = height;
+                      if (_generatedBarcode != null) {
+                        _generatedBarcode = _buildBarcodeWidget();
+                      }
+                    });
+                  },
+                  onShowValueChanged: (show) {
+                    setState(() {
+                      _showValue = show;
+                      if (_generatedBarcode != null) {
+                        _generatedBarcode = _buildBarcodeWidget();
+                      }
+                    });
+                  },
+                  isShowValueEnabled:
+                      !_selectedType.isQR && !_selectedType.is2D,
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isGenerating ? null : _generateBarcode,
+                  icon: _isGenerating
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Icon(Icons.qr_code_2,
+                          size: 28, color: Colors.white),
+                  label: Text(
+                    _isGenerating
+                        ? 'Generating...'
+                        : 'Generate ${_selectedType.displayName}',
+                    style: const TextStyle(
+                      color: Colors.white,
                     ),
                   ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                  ),
                 ),
-            ],
+                const SizedBox(
+                  height: 5,
+                ),
+                const SizedBox(height: 32),
+                if (_generatedBarcode != null)
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: KeyedSubtree(
+                      key: _previewSectionKey,
+                      child: BarcodePreview(
+                        barcodeKey: _barcodeKey,
+                        backgroundColor: _backgroundColor,
+                        onShare: _shareBarcode,
+                        onSave: _downloadBarcode,
+                        onViewFullScreen: _viewBarcodeFullScreen,
+                        child: _generatedBarcode!,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

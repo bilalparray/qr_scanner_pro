@@ -55,167 +55,170 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        title: const Text('Settings'),
-        centerTitle: true,
-        backgroundColor: theme.primaryColor,
-        foregroundColor: Colors.white,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        children: [
-          // App Header
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 48,
-                  backgroundColor: Colors.transparent,
-                  child: Image.asset(
-                    'assets/icon/icon.png',
-                    width: 96,
-                    height: 96,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        drawer: const AppDrawer(),
+        appBar: AppBar(
+          title: const Text('Settings'),
+          centerTitle: true,
+          backgroundColor: theme.primaryColor,
+          foregroundColor: Colors.white,
+        ),
+        body: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          children: [
+            // App Header
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 48,
+                    backgroundColor: Colors.transparent,
+                    child: Image.asset(
+                      'assets/icon/icon.png',
+                      width: 96,
+                      height: 96,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'QR Scanner & Generator',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Text(
-                    'Scan and generate QR codes and barcodes with ease',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'QR Scanner & Generator',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 32, thickness: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Unlock Premium Features',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: theme.textTheme.titleLarge?.color,
+                  const SizedBox(height: 12),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text(
+                      'Scan and generate QR codes and barcodes with ease',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.workspace_premium_outlined,
-            title: 'Enjoy Ad Free Experience',
-            subtitle: 'Unlock premium features',
-            onTap: () {
-              _launchUrl(Environment.playstoreProUrl);
-            },
-          ),
-          // App Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'App',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: theme.textTheme.titleLarge?.color,
-              ),
-            ),
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.share,
-            title: 'Share App',
-            subtitle: 'Tell others about the app',
-            onTap: () {
-              shareContent(
-                  text:
-                      'Check out the Ultimate QR Scanner & Generator: ${Environment.playstoreUrl}');
-            },
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.system_update,
-            title: 'Check for Updates',
-            onTap: () {
-              _launchUrl(Environment.playstoreUrl);
-            },
-          ),
-
-          // Legal Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Legal',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: theme.textTheme.titleLarge?.color,
-              ),
-            ),
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.privacy_tip,
-            title: 'Privacy Policy',
-            onTap: () {
-              _launchUrl(Environment.privacyPolicy);
-            },
-          ),
-
-          // Support Section
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Support',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: theme.textTheme.titleLarge?.color,
-              ),
-            ),
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.feedback,
-            title: 'Feedback & Review',
-            subtitle: 'Help us improve by leaving a review',
-            onTap: () {
-              _launchUrl(Environment.playstoreUrl);
-            },
-          ),
-          _buildSettingTile(
-            context,
-            icon: Icons.mail_outline,
-            title: 'Contact Support',
-            subtitle: 'Get in touch with our support team',
-            onTap: () {
-              _launchUrl('mailto:parraybilal34@gmail.com');
-            },
-          ),
-
-          const Divider(height: 32, thickness: 1),
-
-          // Version Info
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Center(
+            const Divider(height: 32, thickness: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
-                'Version: $_version+$_buildNumber',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                'Unlock Premium Features',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: theme.textTheme.titleLarge?.color,
+                ),
               ),
             ),
-          ),
-        ],
+            _buildSettingTile(
+              context,
+              icon: Icons.workspace_premium_outlined,
+              title: 'Enjoy Ad Free Experience',
+              subtitle: 'Unlock premium features',
+              onTap: () {
+                _launchUrl(Environment.playstoreProUrl);
+              },
+            ),
+            // App Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'App',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: theme.textTheme.titleLarge?.color,
+                ),
+              ),
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.share,
+              title: 'Share App',
+              subtitle: 'Tell others about the app',
+              onTap: () {
+                shareContent(
+                    text:
+                        'Check out the Ultimate QR Scanner & Generator: ${Environment.playstoreUrl}');
+              },
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.system_update,
+              title: 'Check for Updates',
+              onTap: () {
+                _launchUrl(Environment.playstoreUrl);
+              },
+            ),
+
+            // Legal Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'Legal',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: theme.textTheme.titleLarge?.color,
+                ),
+              ),
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.privacy_tip,
+              title: 'Privacy Policy',
+              onTap: () {
+                _launchUrl(Environment.privacyPolicy);
+              },
+            ),
+
+            // Support Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'Support',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: theme.textTheme.titleLarge?.color,
+                ),
+              ),
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.feedback,
+              title: 'Feedback & Review',
+              subtitle: 'Help us improve by leaving a review',
+              onTap: () {
+                _launchUrl(Environment.playstoreUrl);
+              },
+            ),
+            _buildSettingTile(
+              context,
+              icon: Icons.mail_outline,
+              title: 'Contact Support',
+              subtitle: 'Get in touch with our support team',
+              onTap: () {
+                _launchUrl('mailto:parraybilal34@gmail.com');
+              },
+            ),
+
+            const Divider(height: 32, thickness: 1),
+
+            // Version Info
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Center(
+                child: Text(
+                  'Version: $_version+$_buildNumber',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
