@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qr_scanner/screens/history.dart';
-import 'package:qr_scanner/screens/premium_screen.dart';
-import 'package:qr_scanner/screens/settings_screen.dart';
+import 'package:qr_scanner_pro/screens/history.dart';
+import 'package:qr_scanner_pro/screens/settings_screen.dart';
 import 'generate_screen.dart';
 import 'scan_screen.dart';
 
@@ -21,7 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
     const BarcodeHomePage(),
     const HistoryPage(),
     const SettingsPage(),
-    const PremiumScreen(),
   ];
 
   @override
@@ -56,10 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.settings),
             label: 'Settings',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.workspace_premium),
-            label: 'Premium',
           ),
         ],
       ),

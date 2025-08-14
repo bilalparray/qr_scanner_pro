@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qr_scanner/widgets/global_error.dart';
+import 'package:qr_scanner_pro/widgets/global_error.dart';
 
 Future<void> downloadFileToDownloads(
   BuildContext context, {

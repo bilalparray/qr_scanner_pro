@@ -16,17 +16,17 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.qayham.qrscanner"
+    namespace = "com.qayham.qrscanner.pro"
 
     // Read Flutter SDK config or fallback to compile against SDK 35 for plugin compatibility
     compileSdk = providers.gradleProperty("flutter.compileSdkVersion").map(String::toInt).getOrElse(35)
 
     defaultConfig {
-        applicationId = "com.qayham.qrscanner"
+        applicationId = "com.qayham.qrscanner.pro"
         minSdk = providers.gradleProperty("flutter.minSdkVersion").map(String::toInt).getOrElse(23)
         targetSdk = providers.gradleProperty("flutter.targetSdkVersion").map(String::toInt).getOrElse(35)
-        versionCode = providers.gradleProperty("flutter.versionCode").map(String::toInt).getOrElse(19)
-        versionName = providers.gradleProperty("flutter.versionName").getOrElse("0.1.4")
+        versionCode = providers.gradleProperty("flutter.versionCode").map(String::toInt).getOrElse(1)
+        versionName = providers.gradleProperty("flutter.versionName").getOrElse("0.0.1")
     }
 
     signingConfigs {
@@ -63,6 +63,3 @@ flutter {
     source = "../.."
 }
 
-dependencies {
-  implementation("com.google.android.gms:play-services-ads:24.5.0")
-}

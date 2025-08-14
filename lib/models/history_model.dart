@@ -1,5 +1,4 @@
-// history_model.dart
-import 'package:qr_scanner/models/generate_code.dart';
+import 'package:qr_scanner_pro/models/generate_code.dart';
 
 class HistoryItem {
   final String content;

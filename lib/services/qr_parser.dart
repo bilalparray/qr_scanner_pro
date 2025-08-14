@@ -1,6 +1,6 @@
 // lib/services/qr_parser.dart
 import 'package:intl/intl.dart';
-import 'package:qr_scanner/models/scan_result.dart';
+import 'package:qr_scanner_pro/models/scan_result.dart';
 
 class QRParser {
   static ScanResultModel parse(String raw) {

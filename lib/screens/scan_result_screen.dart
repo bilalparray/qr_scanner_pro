@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qr_scanner/environment/environment.dart';
-import 'package:qr_scanner/models/scan_result.dart';
-import 'package:qr_scanner/services/banner_ad.dart';
-import 'package:qr_scanner/widgets/action_button.dart';
-import 'package:qr_scanner/widgets/drawer.dart';
+import 'package:qr_scanner_pro/models/scan_result.dart';
+import 'package:qr_scanner_pro/widgets/action_button.dart';
+import 'package:qr_scanner_pro/widgets/drawer.dart';
+
 import '../services/action_handler.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -50,7 +49,6 @@ class ResultScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
 
               // ── Action buttons ───────────────────────────────────────────
               Wrap(

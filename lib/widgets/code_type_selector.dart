@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_scanner/models/generate_code.dart';
+import 'package:qr_scanner_pro/models/generate_code.dart';
 
 class BarcodeTypeSelector extends StatelessWidget {
   final BarcodeCodeType selectedType;

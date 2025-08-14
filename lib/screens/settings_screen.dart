@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:qr_scanner/environment/environment.dart';
-import 'package:qr_scanner/widgets/drawer.dart';
-import 'package:qr_scanner/widgets/share.dart';
+import 'package:qr_scanner_pro/environment/environment.dart';
+import 'package:qr_scanner_pro/utils/barcode_utils.dart';
+import 'package:qr_scanner_pro/widgets/drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -85,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'QR Scanner & Generator',
+                    'QR Scanner & Generator Pro',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
@@ -104,7 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
-                'Unlock Premium Features',
+                'Enjoy Premium Features',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -116,7 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
               context,
               icon: Icons.workspace_premium_outlined,
               title: 'Enjoy Ad Free Experience',
-              subtitle: 'Unlock premium features',
+              subtitle: 'You Are A Premium User',
               onTap: () {
                 _launchUrl(Environment.playstoreProUrl);
               },

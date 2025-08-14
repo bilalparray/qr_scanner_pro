@@ -1,10 +1,9 @@
 import 'package:go_router/go_router.dart';
-import 'package:qr_scanner/screens/generate_screen.dart';
-import 'package:qr_scanner/screens/history.dart';
-import 'package:qr_scanner/screens/home_screen.dart';
-import 'package:qr_scanner/screens/premium_screen.dart';
-import 'package:qr_scanner/screens/scan_screen.dart';
-import 'package:qr_scanner/screens/settings_screen.dart';
+import 'package:qr_scanner_pro/screens/generate_screen.dart';
+import 'package:qr_scanner_pro/screens/history.dart';
+import 'package:qr_scanner_pro/screens/home_screen.dart';
+import 'package:qr_scanner_pro/screens/scan_screen.dart';
+import 'package:qr_scanner_pro/screens/settings_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -27,10 +26,6 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/generate',
       builder: (context, state) => const BarcodeHomePage(),
-    ),
-    GoRoute(
-      path: '/premium',
-      builder: (context, state) => const PremiumScreen(),
     ),
     GoRoute(
       path: '/scan',

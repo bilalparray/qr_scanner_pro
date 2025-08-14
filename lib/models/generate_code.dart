@@ -58,11 +58,7 @@ enum BarcodeCodeType {
     BarcodeCategory.qrCodes,
     'https://example1.com,https://example2.com',
   ),
-  qrCodeVCard(
-    'QR Contact',
-    'Contact info QR',
-    BarcodeCategory.qrCodes,
-    '''
+  qrCodeVCard('QR Contact', 'Contact info QR', BarcodeCategory.qrCodes, '''
 BEGIN:VCARD
 VERSION:3.0
 N:Doe;Jane;;;
@@ -71,8 +67,7 @@ ORG:Company;
 TEL;TYPE=WORK,VOICE:+1234567890
 EMAIL:jane.doe@example.com
 END:VCARD
-''',
-  ),
+'''),
   qrCodeGeo(
     'QR Geo',
     'Geolocation QR',
@@ -257,36 +252,36 @@ END:VCARD
 /// Extension on BarcodeCodeType for convenience getters
 extension BarcodeCodeTypeExtensions on BarcodeCodeType {
   bool get isQR => [
-        BarcodeCodeType.qrCode,
-        BarcodeCodeType.qrCodeWiFi,
-        BarcodeCodeType.microQR,
-        BarcodeCodeType.qrCodeSms,
-        BarcodeCodeType.qrCodeEmail,
-        BarcodeCodeType.qrCodePDF,
-        BarcodeCodeType.qrCodeMultiURl,
-        BarcodeCodeType.qrCodeVCard,
-        BarcodeCodeType.qrCodeGeo,
-        BarcodeCodeType.qrCodeAPP,
-        BarcodeCodeType.qrCodePhone,
-      ].contains(this);
+    BarcodeCodeType.qrCode,
+    BarcodeCodeType.qrCodeWiFi,
+    BarcodeCodeType.microQR,
+    BarcodeCodeType.qrCodeSms,
+    BarcodeCodeType.qrCodeEmail,
+    BarcodeCodeType.qrCodePDF,
+    BarcodeCodeType.qrCodeMultiURl,
+    BarcodeCodeType.qrCodeVCard,
+    BarcodeCodeType.qrCodeGeo,
+    BarcodeCodeType.qrCodeAPP,
+    BarcodeCodeType.qrCodePhone,
+  ].contains(this);
 
   bool get is2D => [
-        BarcodeCodeType.qrCode,
-        BarcodeCodeType.qrCodeWiFi,
-        BarcodeCodeType.microQR,
-        BarcodeCodeType.qrCodeSms,
-        BarcodeCodeType.qrCodeEmail,
-        BarcodeCodeType.qrCodePDF,
-        BarcodeCodeType.qrCodeMultiURl,
-        BarcodeCodeType.qrCodeVCard,
-        BarcodeCodeType.qrCodeGeo,
-        BarcodeCodeType.qrCodeAPP,
-        BarcodeCodeType.qrCodePhone,
-        BarcodeCodeType.dataMatrix,
-        BarcodeCodeType.pdf417,
-        BarcodeCodeType.aztec,
-        // BarcodeCodeType.maxiCode,
-      ].contains(this);
+    BarcodeCodeType.qrCode,
+    BarcodeCodeType.qrCodeWiFi,
+    BarcodeCodeType.microQR,
+    BarcodeCodeType.qrCodeSms,
+    BarcodeCodeType.qrCodeEmail,
+    BarcodeCodeType.qrCodePDF,
+    BarcodeCodeType.qrCodeMultiURl,
+    BarcodeCodeType.qrCodeVCard,
+    BarcodeCodeType.qrCodeGeo,
+    BarcodeCodeType.qrCodeAPP,
+    BarcodeCodeType.qrCodePhone,
+    BarcodeCodeType.dataMatrix,
+    BarcodeCodeType.pdf417,
+    BarcodeCodeType.aztec,
+    // BarcodeCodeType.maxiCode,
+  ].contains(this);
 }
 
 /// Represents input field configuration for barcodes.
@@ -321,7 +316,7 @@ class BarcodeInputField {
             key: 'data',
             label: 'Data',
             hint: 'Enter text, URL, or any data',
-          )
+          ),
         ];
       case BarcodeCodeType.qrCodePDF:
         return const [
@@ -329,14 +324,20 @@ class BarcodeInputField {
             key: 'data',
             label: 'PDF Link',
             hint: 'Enter PDF Link',
-          )
+          ),
         ];
       case BarcodeCodeType.qrCodeWiFi:
         return const [
           BarcodeInputField(
-              key: 'ssid', label: 'WiFi SSID', hint: 'MyWiFiNetwork'),
+            key: 'ssid',
+            label: 'WiFi SSID',
+            hint: 'MyWiFiNetwork',
+          ),
           BarcodeInputField(
-              key: 'password', label: 'Password', hint: 'WiFi password'),
+            key: 'password',
+            label: 'Password',
+            hint: 'WiFi password',
+          ),
           BarcodeInputField(
             key: 'security',
             label: 'Security Type',
@@ -358,85 +359,97 @@ class BarcodeInputField {
       case BarcodeCodeType.qrCodeSms:
         return const [
           BarcodeInputField(
-              key: 'phone',
-              label: 'Phone Number',
-              hint: '+1234567890',
-              keyboardType: TextInputType.phone),
+            key: 'phone',
+            label: 'Phone Number',
+            hint: '+1234567890',
+            keyboardType: TextInputType.phone,
+          ),
           BarcodeInputField(
-              key: 'message',
-              label: 'Message',
-              hint: 'Hello from QR',
-              isRequired: false),
+            key: 'message',
+            label: 'Message',
+            hint: 'Hello from QR',
+            isRequired: false,
+          ),
         ];
       case BarcodeCodeType.qrCodeEmail:
         return const [
           BarcodeInputField(
-              key: 'email',
-              label: 'Email Address',
-              hint: 'example@example.com',
-              pattern: r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-              keyboardType: TextInputType.emailAddress),
+            key: 'email',
+            label: 'Email Address',
+            hint: 'example@example.com',
+            pattern: r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+            keyboardType: TextInputType.emailAddress,
+          ),
           BarcodeInputField(
-              key: 'subject',
-              label: 'Subject',
-              hint: 'Hello',
-              isRequired: false),
+            key: 'subject',
+            label: 'Subject',
+            hint: 'Hello',
+            isRequired: false,
+          ),
           BarcodeInputField(
-              key: 'body',
-              label: 'Body',
-              hint: 'This is a test',
-              isRequired: false),
+            key: 'body',
+            label: 'Body',
+            hint: 'This is a test',
+            isRequired: false,
+          ),
         ];
       case BarcodeCodeType.qrCodeVCard:
         return const [
           BarcodeInputField(key: 'name', label: 'Full Name', hint: 'Jane Doe'),
           BarcodeInputField(
-              key: 'phone',
-              label: 'Phone',
-              hint: '+1234567890',
-              keyboardType: TextInputType.phone),
+            key: 'phone',
+            label: 'Phone',
+            hint: '+1234567890',
+            keyboardType: TextInputType.phone,
+          ),
           BarcodeInputField(
-              key: 'email',
-              label: 'Email',
-              hint: 'jane.doe@example.com',
-              pattern: r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-              isRequired: false,
-              keyboardType: TextInputType.emailAddress),
+            key: 'email',
+            label: 'Email',
+            hint: 'jane.doe@example.com',
+            pattern: r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+            isRequired: false,
+            keyboardType: TextInputType.emailAddress,
+          ),
           BarcodeInputField(
-              key: 'organization',
-              label: 'Organization',
-              hint: 'Company',
-              isRequired: false),
+            key: 'organization',
+            label: 'Organization',
+            hint: 'Company',
+            isRequired: false,
+          ),
         ];
       case BarcodeCodeType.qrCodeGeo:
         return const [
           BarcodeInputField(
-              key: 'latitude',
-              label: 'Latitude',
-              hint: '37.7749',
-              keyboardType: TextInputType.number),
+            key: 'latitude',
+            label: 'Latitude',
+            hint: '37.7749',
+            keyboardType: TextInputType.number,
+          ),
           BarcodeInputField(
-              key: 'longitude',
-              label: 'Longitude',
-              hint: '-122.4194',
-              keyboardType: TextInputType.number),
+            key: 'longitude',
+            label: 'Longitude',
+            hint: '-122.4194',
+            keyboardType: TextInputType.number,
+          ),
         ];
       case BarcodeCodeType.qrCodeAPP:
         return const [
           BarcodeInputField(
-              key: 'url',
-              label: 'App URL or Deep Link',
-              hint:
-                  'https://play.google.com/store/apps/details?id=com.qayham.qrscanner',
-              keyboardType: TextInputType.url),
+            key: 'url',
+            label: 'App URL or Deep Link',
+            hint:
+                'https://play.google.com/store/apps/details?id=com.qayham.qrscanner.pro',
+            keyboardType: TextInputType.url,
+          ),
         ];
       case BarcodeCodeType.qrCodePhone:
         return const [
           BarcodeInputField(
-              key: 'phone',
-              label: 'Phone Number',
-              hint: '+1234567890',
-              keyboardType: TextInputType.phone),
+            key: 'phone',
+            label: 'Phone Number',
+            hint: '+1234567890',
+            keyboardType: TextInputType.phone,
+          ),
         ];
 
       // 1D Linear Barcodes
@@ -549,10 +562,11 @@ class BarcodeInputField {
       case BarcodeCodeType.codabar:
         return const [
           BarcodeInputField(
-              key: 'data',
-              label: 'Codabar Data',
-              hint: 'e.g., 123456',
-              pattern: r'^[0-9\-\$\:\/\.\+]+$'),
+            key: 'data',
+            label: 'Codabar Data',
+            hint: 'e.g., 123456',
+            pattern: r'^[0-9\-\$\:\/\.\+]+$',
+          ),
         ];
       case BarcodeCodeType.itf:
         return const [
@@ -596,7 +610,10 @@ class BarcodeInputField {
       case BarcodeCodeType.aztec:
         return const [
           BarcodeInputField(
-              key: 'data', label: 'Data', hint: 'Up to 3750 bytes'),
+            key: 'data',
+            label: 'Data',
+            hint: 'Up to 3750 bytes',
+          ),
         ];
       // case BarcodeCodeType.maxiCode:
       //   return const [

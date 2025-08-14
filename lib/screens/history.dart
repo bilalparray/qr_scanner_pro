@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:qr_scanner/environment/environment.dart';
-import 'package:qr_scanner/models/generate_code.dart';
-import 'package:qr_scanner/services/ad_service.dart';
-import 'package:qr_scanner/services/banner_ad.dart';
-import 'package:qr_scanner/widgets/drawer.dart';
-import 'package:syncfusion_flutter_barcodes/barcodes.dart';
-import 'package:qr_scanner/models/history_model.dart';
-import 'package:qr_scanner/providers/history_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_scanner_pro/models/generate_code.dart';
+import 'package:qr_scanner_pro/models/history_model.dart';
+import 'package:qr_scanner_pro/providers/history_provider.dart';
+import 'package:qr_scanner_pro/widgets/drawer.dart';
+import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -22,7 +19,6 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    AdService.instance.showInterstitialAd(() {});
   }
 
   String _formatTimestamp(DateTime timestamp) {
@@ -228,7 +224,6 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
         body: Column(
           children: [
-            IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
             Expanded(
               child: Consumer<HistoryProvider>(
                 builder: (context, provider, _) {

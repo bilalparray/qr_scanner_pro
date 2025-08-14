@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_scanner/models/generate_code.dart';
+import 'package:qr_scanner_pro/models/generate_code.dart';
 
 class BarcodeInputFields extends StatelessWidget {
   final List<BarcodeInputField> inputFields;

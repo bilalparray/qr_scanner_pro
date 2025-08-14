@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qr_scanner/environment/environment.dart';
-import 'package:qr_scanner/services/banner_ad.dart';
 
 class BarcodePreview extends StatelessWidget {
   final GlobalKey barcodeKey;
@@ -124,7 +122,6 @@ class BarcodePreviewFullScreenPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
             Container(
               color: backgroundColor,
               padding: const EdgeInsets.all(16),

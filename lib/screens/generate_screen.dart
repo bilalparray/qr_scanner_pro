@@ -2,19 +2,19 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:qr_scanner/environment/environment.dart';
-import 'package:qr_scanner/models/generate_code.dart';
-import 'package:qr_scanner/providers/history_provider.dart';
-import 'package:qr_scanner/screens/settings_screen.dart';
-import 'package:qr_scanner/services/banner_ad.dart';
-import 'package:qr_scanner/utils/barcode_utils.dart';
-import 'package:qr_scanner/widgets/barcode_viewer.dart';
-import 'package:qr_scanner/widgets/barcode_customisation.dart';
-import 'package:qr_scanner/widgets/barcode_input_fields.dart';
-import 'package:qr_scanner/widgets/code_type_selector.dart';
-import 'package:qr_scanner/widgets/download.dart';
-import 'package:qr_scanner/widgets/drawer.dart';
-import 'package:qr_scanner/widgets/global_error.dart';
+import 'package:qr_scanner_pro/environment/environment.dart';
+import 'package:qr_scanner_pro/models/generate_code.dart';
+import 'package:qr_scanner_pro/providers/history_provider.dart';
+import 'package:qr_scanner_pro/screens/settings_screen.dart';
+import 'package:qr_scanner_pro/utils/barcode_utils.dart';
+import 'package:qr_scanner_pro/widgets/barcode_customisation.dart';
+import 'package:qr_scanner_pro/widgets/barcode_input_fields.dart';
+import 'package:qr_scanner_pro/widgets/barcode_viewer.dart';
+import 'package:qr_scanner_pro/widgets/code_type_selector.dart';
+import 'package:qr_scanner_pro/widgets/download.dart';
+import 'package:qr_scanner_pro/widgets/drawer.dart';
+import 'package:qr_scanner_pro/widgets/global_error.dart';
+
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'dart:async';
 import 'dart:ui' as ui;
@@ -22,7 +22,6 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
-import 'package:qr_scanner/services/ad_service.dart';
 
 class BarcodeHomePage extends StatefulWidget {
   const BarcodeHomePage({super.key});
@@ -58,7 +57,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
   @override
   void initState() {
     super.initState();
-    AdService.instance.showInterstitialAd(() {});
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -101,7 +99,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
     setState(() => _isGenerating = true);
 
     try {
-      AdService.instance.showRewardedAd(() {});
       await Future.delayed(const Duration(milliseconds: 300)); // UI feedback
       final widget = _buildBarcodeWidget();
       if (widget != null) {
@@ -389,7 +386,6 @@ class _BarcodeHomePageState extends State<BarcodeHomePage>
                   selectedType: _selectedType,
                   onTypeChanged: _onBarcodeTypeChanged,
                 ),
-                IndependentBannerAdWidget(adUnitId: Environment.bannerAdUnitId),
                 BarcodeInputFields(
                   inputFields: inputFields,
                   controllers: _controllers,

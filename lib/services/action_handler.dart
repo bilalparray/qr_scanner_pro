@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' hide Event;
 import 'package:path_provider/path_provider.dart';
-import 'package:qr_scanner/models/scan_result.dart';
+import 'package:qr_scanner_pro/models/scan_result.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wifi_iot/wifi_iot.dart';

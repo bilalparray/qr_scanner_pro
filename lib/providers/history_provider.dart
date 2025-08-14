@@ -1,9 +1,9 @@
 // history_provider.dart
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:qr_scanner/models/history_model.dart';
+import 'package:qr_scanner_pro/models/generate_code.dart';
+import 'package:qr_scanner_pro/models/history_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:qr_scanner/models/generate_code.dart';
 
 class HistoryProvider with ChangeNotifier {
   static const _prefsKey = 'barcode_history';

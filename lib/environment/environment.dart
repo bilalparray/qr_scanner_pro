@@ -10,13 +10,13 @@ class Environment {
 
   static const String developer = 'Bilal Ahmad Parray';
   static const String playstoreProUrl =
-      'https://play.google.com/store/apps/details?id=com.qayham.qrscanner.pro';
+      'https://play.google.com/store/apps/details?id=com.qayham.qrscanner.pro.pro';
   static const String playstoreUrl =
-      'https://play.google.com/store/apps/details?id=com.qayham.qrscanner';
+      'https://play.google.com/store/apps/details?id=com.qayham.qrscanner.pro';
   static const String privacyPolicy =
       'https://qayham.com/products/qrscanner/privacy.html';
 
-// ads
+  // ads
 
   static String bannerAdUnitId = 'ca-app-pub-3821692834936093/4150223258';
   static String interstitialAdUnitId = 'ca-app-pub-3821692834936093/5215344179';
