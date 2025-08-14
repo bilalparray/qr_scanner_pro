@@ -86,14 +86,6 @@ class AppDrawer extends StatelessWidget {
               context.go('/settings');
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Remove Ads'),
-            onTap: () {
-              Navigator.pop(context);
-              context.go('/premium');
-            },
-          ),
         ],
       ),
     );
