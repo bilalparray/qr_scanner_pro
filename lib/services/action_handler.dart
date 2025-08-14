@@ -49,8 +49,9 @@ class ActionHandler {
         await _openUri(ctx, Uri.parse('tel:${result.parsed!['phone']}'));
         break;
       case ScanDataType.email:
-        await _openUri(ctx, Uri.parse(result.raw));
+        openGmail(result.parsed!['email'] as String);
         break;
+
       case ScanDataType.sms:
         final phone = result.parsed!['phone'] as String;
         final msg = Uri.encodeComponent(result.parsed!['message'] as String);
@@ -84,6 +85,31 @@ class ActionHandler {
       messenger.showSnackBar(
         const SnackBar(content: Text('Cannot open URI')),
       );
+    }
+  }
+
+  static Future<void> openGmail(String email,
+      {String? subject, String? body}) async {
+    final androidUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      queryParameters: {
+        if (subject != null) 'subject': subject,
+        if (body != null) 'body': body,
+      },
+    );
+
+    // Gmail's Android package name
+    const gmailPackage = 'com.google.android.gm';
+
+    final launchUri = Uri.parse(
+        'intent://${androidUri.toString().replaceFirst('mailto:', '')}#Intent;scheme=mailto;package=$gmailPackage;end');
+
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      debugPrint('Gmail app not found, falling back to default mail client');
+      await launchUrl(androidUri, mode: LaunchMode.externalApplication);
     }
   }
 
