@@ -117,9 +117,6 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icons.workspace_premium_outlined,
               title: 'Enjoy Ad Free Experience',
               subtitle: 'You Are A Premium User',
-              onTap: () {
-                _launchUrl(Environment.playstoreProUrl);
-              },
             ),
             // App Section
             Padding(
